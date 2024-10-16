@@ -8,7 +8,7 @@ SOFTDEVICE_MODEL = blank
 # Source and header files
 APP_HEADER_PATHS += ./include
 APP_SOURCE_PATHS += ./src
-APP_SOURCES = $(notdir $(wildcard src/*.c))
+APP_SOURCES = $(notdir $(wildcard src/*.cpp))
 
 # Path to base of nRF52x-base repo
 NRF_BASE_DIR = sdk/nrf52x-base/
