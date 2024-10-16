@@ -1,0 +1,12 @@
+*.pyc
+.bzr/*
+*.~*
+docs/manual.html
+docs/manual/.build/doctrees/*
+docs/manual/.build/html/*
+venv/
+dist/
+MANIFEST
+python.bat
+NEWS.html
+README.html
