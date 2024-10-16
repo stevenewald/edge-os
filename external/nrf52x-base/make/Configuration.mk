@@ -260,10 +260,13 @@ override CFLAGS += \
     #-DSOFTDEVICE_$(SOFTDEVICE_MODEL)\
     #-DCONFIG_GPIO_AS_PINRESET\
 
+CXX_HEADER_INCLUDES = $(HEADER_INCLUDES) $(addprefix -include,$(ETL_INCLUDES))
+
 override CXXFLAGS += \
     -std=c++20 \
     -c \
     $(CPUFLAGS) \
+	-DET_NO_STL \
     -Wall \
     -Wextra \
     -Wno-date-time \
@@ -282,7 +285,7 @@ override CXXFLAGS += \
     -fno-strict-aliasing \
     -fno-builtin \
     -fshort-enums \
-    $(HEADER_INCLUDES) \
+    $(CXX_HEADER_INCLUDES) \
     -MD \
     -fomit-frame-pointer \
 	-Wno-volatile
