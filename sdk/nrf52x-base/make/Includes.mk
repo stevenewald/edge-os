@@ -825,9 +825,12 @@ PBOPTS = $(filter %.options,$(SOURCES))
 PBGENS = $(PBSRCS:.proto=.pb.c) $(PBSRCS:.proto=.pb.h)
 CSOURCES = $(filter %.c,$(SOURCES))
 CSOURCES += $(filter %.c,$(PBGENS))
-OBJS = $(addprefix $(BUILDDIR), $(CSOURCES:.c=.o))
-DEBUG_OBJS = $(addprefix $(BUILDDIR), $(CSOURCES:.c=.o-debug))
-DEPS = $(addprefix $(BUILDDIR), $(CSOURCES:.c=.d))
+
+CPPSOURCES = $(filter %.cpp,$(SOURCES))
+
+OBJS = $(addprefix $(BUILDDIR), $(CSOURCES:.c=.o) $(CPPSOURCES:.cpp=.o))
+DEBUG_OBJS = $(addprefix $(BUILDDIR), $(CSOURCES:.c=.o-debug) $(CPPSOURCES:.cpp=.o-debug))
+DEPS = $(addprefix $(BUILDDIR), $(CSOURCES:.c=.d) $(CPPSOURCES:.cpp=.d))
 
 SOURCES_AS = $(notdir $(SDK_AS)) $(notdir $(BOARD_AS)) $(notdir $(APP_AS))
 OBJS_AS = $(addprefix $(BUILDDIR), $(SOURCES_AS:.S=.os))

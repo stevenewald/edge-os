@@ -260,6 +260,34 @@ override CFLAGS += \
     #-DSOFTDEVICE_$(SOFTDEVICE_MODEL)\
     #-DCONFIG_GPIO_AS_PINRESET\
 
+override CXXFLAGS += \
+    -std=c++20 \
+    -c \
+    $(CPUFLAGS) \
+    -Wall \
+    -Wextra \
+    -Wno-date-time \
+    -Wno-unused-parameter \
+    -Werror=return-type \
+    -Wno-expansion-to-defined \
+    -Wno-packed-bitfield-compat \
+    $(CONFIGURATION_DEFINES) \
+    $(SDK_DEFINES) \
+    -DGIT_VERSION=\"$(GIT_VERSION)\" \
+    -DCONFIG_GPIO_AS_PINRESET \
+    -DCONFIG_NFCT_PINS_AS_GPIOS \
+    -s \
+    -ffunction-sections \
+    -fdata-sections \
+    -fno-strict-aliasing \
+    -fno-builtin \
+    -fshort-enums \
+    $(HEADER_INCLUDES) \
+    -MD \
+    -fomit-frame-pointer \
+	-Wno-volatile
+
+
 #XXX: document this somewhere
 override OPTIMIZATION_FLAG ?= -Os
 
