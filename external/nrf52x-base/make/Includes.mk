@@ -428,6 +428,7 @@ ifneq (,$(filter $(NRF_IC),nrf52832 nrf52833 nrf52840))
 
     # Need to add the paths for all the directories in the SDK.
     # Note that we do not use * because some folders have conflicting files.
+    # SDK_HEADER_PATHS += external/etl/include/etl/
     SDK_HEADER_PATHS += $(SDK_ROOT)modules/nrfx/
     SDK_HEADER_PATHS += $(SDK_ROOT)modules/nrfx/mdk/
     SDK_HEADER_PATHS += $(SDK_ROOT)modules/nrfx/hal/

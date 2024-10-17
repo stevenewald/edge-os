@@ -59,7 +59,7 @@ $(BUILDDIR)%.o: %.c $(PGENS) | $(BUILDDIR)
 	$(Q)$(CC) $(LDFLAGS) $(CFLAGS) $(OPTIMIZATION_FLAG) $< -o $@
 
 $(BUILDDIR)%.o: %.cpp $(PGENS) | $(BUILDDIR)
-	$(TRACE_CC)
+	$(TRACE_CXX)
 	$(Q)$(CXX) $(LDFLAGS) $(CXXFLAGS) $(OPTIMIZATION_FLAG) -c $< -o $@
 
 $(BUILDDIR)%.o-debug: %.c $(PGENS) | $(BUILDDIR)
@@ -67,13 +67,13 @@ $(BUILDDIR)%.o-debug: %.c $(PGENS) | $(BUILDDIR)
 	$(Q)$(CC) $(LDFLAGS) $(CFLAGS) -g -O0 $< -o $@
 
 $(BUILDDIR)%.o-debug: %.cpp $(PGENS) | $(BUILDDIR)
-	$(TRACE_CC)
+	$(TRACE_CXX)
 	$(Q)$(CXX) $(LDFLAGS) $(CXXFLAGS) -g -O0 -c $< -o $@
 
 .PRECIOUS: $(BUILDDIR)%.s
 $(BUILDDIR)%.s: %.S | $(BUILDDIR)
 	$(TRACE_CC)
-	$(Q)$(CC) -E $(SDK_DEFINES) $< > $@
+	$(Q)$(CXX) -E $(SDK_DEFINES) $< > $@
 
 $(BUILDDIR)%.os: $(BUILDDIR)%.s | $(BUILDDIR)
 	$(TRACE_AS)
