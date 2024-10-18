@@ -266,7 +266,7 @@ override CXXFLAGS += \
     -std=c++20 \
     -c \
     $(CPUFLAGS) \
-	-DET_NO_STL \
+	-DETL_NO_STL \
     -Wall \
     -Wextra \
     -Wno-date-time \
