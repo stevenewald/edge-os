@@ -2,6 +2,8 @@
 
 namespace edge {
 
+Scheduler scheduler;
+
 void
 Scheduler::start_scheduler()
 {
@@ -15,6 +17,26 @@ Scheduler::start_scheduler()
     NVIC_SetPriority(SysTick_IRQn, 0x1);
     asm("CPSIE I");
     asm("SVC #0");
+}
+
+void
+Scheduler::add_task(void (*function)(void), uint8_t priority)
+{
+    task_stack.emplace_back(
+        process_metadata{reinterpret_cast<unsigned>(function)}, priority
+    );
+}
+
+void
+Scheduler::handle_first_svc_hit()
+{
+    // Unprivileged Mode
+    __set_CONTROL(0x03);
+
+    __set_PSP((unsigned)task_stack[current_task_index].stack_ptr_loc);
+
+    // Trigger PendSV
+    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 }
 
 void
@@ -34,67 +56,18 @@ Scheduler::handle_priority_change()
     printf("Task %d requested new priority %d\n", current_task_index, new_prio);
 }
 
-void
-Scheduler::handle_first_svc_hit()
-{
-    // Unprivileged Mode
-    __set_CONTROL(0x03);
-
-    __set_PSP((unsigned)task_stack[current_task_index].stack_ptr_loc);
-
-    // Trigger PendSV
-    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
-}
-
-void
-Scheduler::advance_turn()
-{
-    // This function will dirty registers. That's okay
-
-    task_stack[current_task_index].stack_ptr_loc = (unsigned*)__get_PSP();
-
-    current_task_index =
-        (current_task_index >= task_stack.size() - 1) ? 0 : current_task_index + 1;
-
-    slices_remaining = task_stack[current_task_index].priority;
-
-    __set_PSP((unsigned)task_stack[current_task_index].stack_ptr_loc);
-}
-
-bool
-Scheduler::continue_current_task()
-{
-    return --slices_remaining > 0;
-}
-
-void
-Scheduler::print_info() const
-{
-    printf("Task %d has %d slices remaining\n", current_task_index, slices_remaining);
-}
-
-void
-Scheduler::add_task(void (*function)(void), uint8_t priority)
-{
-    task_stack.emplace_back(
-        process_metadata{reinterpret_cast<unsigned>(function)}, priority
-    );
-}
-
 extern "C" {
-void
-print_task_info(void)
-{
-    scheduler.print_info();
-}
 
-__attribute__((naked)) void
+__attribute__((naked, used)) void
 PendSV_Handler()
 {
     asm("CPSID I");
 
-    if (scheduler.continue_current_task()) {
-        asm("bl print_task_info");
+    if (--scheduler.slices_remaining > 0) {
+        printf(
+            "Task %d has %d slices remaining\n", scheduler.current_task_index,
+            scheduler.slices_remaining
+        );
         goto END;
     }
 
@@ -108,7 +81,21 @@ PendSV_Handler()
     asm("mov r7,r11");
     asm("stm r0!,{r4,r5,r6,r7}");
 
-    scheduler.advance_turn();
+    // This function will dirty registers. That's okay
+    scheduler.task_stack[scheduler.current_task_index].stack_ptr_loc =
+        reinterpret_cast<unsigned*>(__get_PSP());
+
+    scheduler.current_task_index =
+        (scheduler.current_task_index >= scheduler.task_stack.size() - 1)
+            ? 0
+            : scheduler.current_task_index + 1;
+
+    scheduler.slices_remaining =
+        scheduler.task_stack[scheduler.current_task_index].priority;
+
+    __set_PSP(reinterpret_cast<unsigned>(
+        scheduler.task_stack[scheduler.current_task_index].stack_ptr_loc
+    ));
 
     // Restore next context
     asm("mrs r0,psp");
@@ -129,7 +116,7 @@ END:
     asm("bx r0");
 }
 
-void
+__attribute__((used)) void
 SysTick_Handler()
 {
     // Trigger PENDSV
@@ -137,7 +124,7 @@ SysTick_Handler()
 }
 
 // Triggered on program start, as well as when process wants to change priority
-void
+__attribute__((used)) void
 SVC_Handler()
 {
     static bool first_svc_hit = true;
@@ -150,5 +137,4 @@ SVC_Handler()
     }
 }
 }
-edge::Scheduler scheduler;
 } // namespace edge

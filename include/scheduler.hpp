@@ -53,13 +53,7 @@ public:
 
     void start_scheduler();
 
-    void print_info() const;
-
 private:
-    bool continue_current_task();
-
-    void advance_turn();
-
     void handle_first_svc_hit();
 
     void handle_priority_change();
