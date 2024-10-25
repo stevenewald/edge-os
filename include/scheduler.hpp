@@ -53,14 +53,6 @@ public:
 
     void start_scheduler();
 
-    void
-    print_info() const
-    {
-        printf(
-            "Task %d has %d slices remaining\n", current_task_index, slices_remaining
-        );
-    }
-
 private:
     void handle_first_svc_hit();
 

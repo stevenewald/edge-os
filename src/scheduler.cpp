@@ -64,7 +64,10 @@ PendSV_Handler()
     asm("CPSID I");
 
     if (--scheduler.slices_remaining > 0) {
-        scheduler.print_info();
+        printf(
+            "Task %d has %d slices remaining\n", scheduler.current_task_index,
+            scheduler.slices_remaining
+        );
         goto END;
     }
 
