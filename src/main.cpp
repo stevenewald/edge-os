@@ -1,10 +1,10 @@
 #include "nrf_delay.h"
 #include "nrf_gpio.h"
 #include "scheduler.hpp"
+#include "syscalls.hpp"
 #include "timer.hpp"
 
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
 
 // Pin configurations
@@ -17,9 +17,6 @@ static constexpr auto TASK2_PRIO = 20;
 void
 task0(void)
 {
-    // Change priority (optional)
-    asm("SVC #14");
-
     nrf_gpio_cfg_output(LED_COL1);
     int i = 0;
     while (1) {
@@ -28,9 +25,12 @@ task0(void)
     }
 }
 
+// Demonstrates priority change
 void
 task1(void)
 {
+    edge::userlib::change_priority(2);
+
     nrf_gpio_cfg_output(LED_COL2);
     int i = 0;
     while (1) {
@@ -39,27 +39,24 @@ task1(void)
     }
 }
 
+// Demonstrates yielding
+// Toggle LED then yield
 void
 task2(void)
 {
     nrf_gpio_cfg_output(LED_COL3);
-    int i = 0;
     while (1) {
-        if (i++ % 300000 == 0)
-            nrf_gpio_pin_toggle(LED_COL3);
+        nrf_gpio_pin_toggle(LED_COL3);
+        edge::userlib::yield();
     }
 }
 
 int
 main(void)
 {
-    // Initialize.
-    // nrf_gpio_cfg_output(LED_MIC);
-
     // edge::KernelTimerController::get_instance();
 
-    // Enter main loop.
-    printf("Starting\n");
+    printf("Starting EdgeOS\n");
     nrf_gpio_cfg_output(LED_ROW1);
     nrf_gpio_pin_set(LED_ROW1);
 

@@ -1,5 +1,7 @@
 #include "scheduler.hpp"
 
+#include "system_call_type.hpp"
+
 namespace edge {
 
 Scheduler scheduler;
@@ -40,20 +42,11 @@ Scheduler::handle_first_svc_hit()
 }
 
 void
-Scheduler::handle_priority_change()
+Scheduler::change_current_task_priority(uint8_t new_priority)
 {
-    uint8_t new_prio = 0;
-    uint16_t* PC_reg;
-
-    uint32_t* SP_reg;
-    asm("MRS %0,PSP" : "=r"(SP_reg));
-
-    // this is bad. fix
-    PC_reg = reinterpret_cast<uint16_t*>(SP_reg[6]);
-    new_prio = PC_reg[-1] & 0xFF;
-
-    task_stack[current_task_index].priority = new_prio;
-    printf("Task %d requested new priority %d\n", current_task_index, new_prio);
+    task_stack[current_task_index].priority = new_priority;
+    slices_remaining = etl::min(slices_remaining, new_priority);
+    printf("Task %d requested new priority %d\n", current_task_index, new_priority);
 }
 
 extern "C" {
@@ -122,19 +115,14 @@ SysTick_Handler()
     // Trigger PENDSV
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 }
+}
 
-// Triggered on program start, as well as when process wants to change priority
-__attribute__((used)) void
-SVC_Handler()
+void
+Scheduler::yield_current_task()
 {
-    static bool first_svc_hit = true;
-    if (first_svc_hit) {
-        scheduler.handle_first_svc_hit();
-        first_svc_hit = false;
-    }
-    else {
-        scheduler.handle_priority_change();
-    }
+    printf("Task %d yielded\n", current_task_index);
+    slices_remaining = 1;
+    PendSV_Handler();
 }
-}
+
 } // namespace edge
