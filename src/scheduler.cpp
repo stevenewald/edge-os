@@ -109,11 +109,14 @@ END:
     asm("bx r0");
 }
 
+void trigger_pendsv() {
+    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+}
+
 __attribute__((used)) void
 SysTick_Handler()
 {
-    // Trigger PENDSV
-    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+	trigger_pendsv();
 }
 }
 
@@ -122,7 +125,7 @@ Scheduler::yield_current_task()
 {
     printf("Task %d yielded\n", current_task_index);
     slices_remaining = 1;
-    PendSV_Handler();
+	trigger_pendsv();
 }
 
 } // namespace edge
