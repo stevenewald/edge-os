@@ -3,8 +3,7 @@
 #include "nrf_delay.h"
 
 extern "C" {
-void
-TIMER4_IRQHandler(void)
+void TIMER4_IRQHandler(void)
 {
     printf("Interrupt!\n");
     using edge::KernelTimerController;

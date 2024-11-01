@@ -5,23 +5,20 @@
 #include <cstdio>
 
 namespace edge {
-void
-handle_priority_change()
+void handle_priority_change()
 {
     unsigned int new_priority;
     READ_REGISTER(r0, new_priority);
     scheduler.change_current_task_priority(new_priority);
 }
 
-void
-handle_yield()
+void handle_yield()
 {
     scheduler.yield_current_task();
 }
 
 extern "C" {
-__attribute__((used)) void
-SVC_Handler(void)
+__attribute__((used)) void SVC_Handler(void)
 {
     static bool has_hit = false;
     if (!has_hit) {

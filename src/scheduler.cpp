@@ -6,10 +6,9 @@ namespace edge {
 
 Scheduler scheduler;
 
-void
-Scheduler::start_scheduler()
+void Scheduler::start_scheduler()
 {
-    asm("CPSID I");
+    asm volatile("CPSID I");
     SysTick->LOAD = 16000000; // period
     SysTick->VAL = 0;
     SysTick->CTRL =
@@ -17,20 +16,18 @@ Scheduler::start_scheduler()
 
     NVIC_SetPriority(PendSV_IRQn, 0x3);
     NVIC_SetPriority(SysTick_IRQn, 0x1);
-    asm("CPSIE I");
-    asm("SVC #0");
+    asm volatile("CPSIE I");
+    asm volatile("SVC #0");
 }
 
-void
-Scheduler::add_task(void (*function)(void), uint8_t priority)
+void Scheduler::add_task(void (*function)(void), uint8_t priority)
 {
     task_stack.emplace_back(
-        process_metadata{reinterpret_cast<unsigned>(function)}, priority
+        saved_registers{reinterpret_cast<unsigned>(function)}, priority
     );
 }
 
-void
-Scheduler::handle_first_svc_hit()
+void Scheduler::handle_first_svc_hit()
 {
     // Unprivileged Mode
     __set_CONTROL(0x03);
@@ -41,8 +38,7 @@ Scheduler::handle_first_svc_hit()
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 }
 
-void
-Scheduler::change_current_task_priority(uint8_t new_priority)
+void Scheduler::change_current_task_priority(uint8_t new_priority)
 {
     task_stack[current_task_index].priority = new_priority;
     slices_remaining = etl::min(slices_remaining, new_priority);
@@ -51,11 +47,10 @@ Scheduler::change_current_task_priority(uint8_t new_priority)
 
 extern "C" {
 
-__attribute__((naked, used)) void
-PendSV_Handler()
-{
-    asm("CPSID I");
+__attribute__((naked, used)) void PendSV_Handler()
 
+{
+    asm volatile("CPSID I");
     if (--scheduler.slices_remaining > 0) {
         printf(
             "Task %d has %d slices remaining\n", scheduler.current_task_index,
@@ -64,15 +59,9 @@ PendSV_Handler()
         goto END;
     }
 
-    // Save context
-    asm("mrs r0,psp");
-    asm("sub r0,#32");
-    asm("stm r0!,{r4,r5,r6,r7}");
-    asm("mov r4,r8");
-    asm("mov r5,r9");
-    asm("mov r6,r10");
-    asm("mov r7,r11");
-    asm("stm r0!,{r4,r5,r6,r7}");
+    asm volatile("mrs r0,psp\n"
+                 "sub r0,#16\n"
+                 "stm r0!,{r4-r11}");
 
     // This function will dirty registers. That's okay
     scheduler.task_stack[scheduler.current_task_index].stack_ptr_loc =
@@ -90,42 +79,31 @@ PendSV_Handler()
         scheduler.task_stack[scheduler.current_task_index].stack_ptr_loc
     ));
 
-    // Restore next context
-    asm("mrs r0,psp");
-    asm("sub r0,#16");
-    asm("ldm r0!,{R4,R5,R6,R7}");
-    asm("mov r8,r4");
-    asm("mov r9,r5");
-    asm("mov r10,r6");
-    asm("mov r11,r7");
-    asm("sub r0,#32");
-    asm("ldm r0!,{r4,r5,r6,r7}");
-
+    asm volatile("mrs r0,psp\n"
+                 "sub r0,#16\n"
+                 "ldm r0!,{r4-r11}\n");
 END:
-    asm("CPSIE I");
-    // Exit interrupt mode and return to thread mode
-    // We don't want to return in the normal 'C' way, this curcumvents it
-    asm("ldr r0,=0xfffffffd");
-    asm("bx r0");
+    asm volatile("CPSIE I\n"
+                 "ldr r0,=0xfffffffd\n"
+                 "bx r0");
 }
 
-void trigger_pendsv() {
+void trigger_pendsv()
+{
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 }
 
-__attribute__((used)) void
-SysTick_Handler()
+__attribute__((used)) void SysTick_Handler()
 {
-	trigger_pendsv();
+    trigger_pendsv();
 }
 }
 
-void
-Scheduler::yield_current_task()
+void Scheduler::yield_current_task()
 {
     printf("Task %d yielded\n", current_task_index);
     slices_remaining = 1;
-	trigger_pendsv();
+    trigger_pendsv();
 }
 
 } // namespace edge

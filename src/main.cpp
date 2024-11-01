@@ -1,3 +1,5 @@
+#include "gpio_pin.hpp"
+#include "gpio_wrapper.hpp"
 #include "nrf_delay.h"
 #include "nrf_gpio.h"
 #include "scheduler.hpp"
@@ -10,49 +12,42 @@
 // Pin configurations
 #include "microbit_v2.h"
 
-static constexpr auto TASK0_PRIO = 5;
+static constexpr auto TASK0_PRIO = 10;
 static constexpr auto TASK1_PRIO = 10;
-static constexpr auto TASK2_PRIO = 20;
+static constexpr auto TASK2_PRIO = 10;
 
-void
-task0(void)
+void task0(void)
 {
-    nrf_gpio_cfg_output(LED_COL1);
-    int i = 0;
+    edge::drivers::GPIOPin col1(LED_COL1, edge::drivers::GPIOConfiguration::OUT);
+	int i = 0;
     while (1) {
-        if (i++ % 300000 == 0)
-            nrf_gpio_pin_toggle(LED_COL1);
+        if (i++ % 1000000 == 0)
+            col1.toggle();
     }
 }
 
 // Demonstrates priority change
-void
-task1(void)
+void task1(void)
 {
-    edge::userlib::change_priority(2);
-
-    nrf_gpio_cfg_output(LED_COL2);
-    int i = 0;
+    edge::drivers::GPIOPin col2(LED_COL2, edge::drivers::GPIOConfiguration::OUT);
+    col2.set();
     while (1) {
-        if (i++ % 300000 == 0)
-            nrf_gpio_pin_toggle(LED_COL2);
+        col2.toggle();
     }
 }
 
 // Demonstrates yielding
 // Toggle LED then yield
-void
-task2(void)
+void task2(void)
 {
-    nrf_gpio_cfg_output(LED_COL3);
+    edge::drivers::GPIOPin col3(LED_COL3, edge::drivers::GPIOConfiguration::OUT);
     while (1) {
-        nrf_gpio_pin_toggle(LED_COL3);
+        col3.toggle();
         edge::userlib::yield();
     }
 }
 
-int
-main(void)
+int main(void)
 {
     // edge::KernelTimerController::get_instance();
 
