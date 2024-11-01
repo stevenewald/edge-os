@@ -1,7 +1,10 @@
-#include "syscalls.hpp"
+#include "userlib/syscalls.hpp"
 
+#include "drivers/driver_types.hpp"
 #include "register_utils.hpp"
-#include "system_call_type.hpp"
+#include "userlib/system_call_type.hpp"
+
+#include <stdio.h>
 
 namespace edge::userlib {
 void change_priority(uint8_t new_priority)
@@ -13,5 +16,14 @@ void change_priority(uint8_t new_priority)
 void yield()
 {
     TRIGGER_SVC(SystemCallType::YIELD);
+}
+
+void set_led(uint8_t row, uint8_t col, bool enabled)
+{
+    SET_REGISTER(r0, (int)drivers::DriverType::LED_DISPLAY);
+    SET_REGISTER(r1, (int)row);
+    SET_REGISTER(r2, (int)col);
+    SET_REGISTER(r3, (int)enabled);
+    TRIGGER_SVC(SystemCallType::COMMAND);
 }
 } // namespace edge::userlib

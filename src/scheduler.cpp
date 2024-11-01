@@ -1,5 +1,6 @@
 #include "scheduler.hpp"
 
+#include "drivers/driver_controller.hpp"
 #include "nrf52833.h"
 
 namespace edge {
@@ -9,7 +10,7 @@ Scheduler scheduler;
 void Scheduler::start_scheduler()
 {
     asm volatile("CPSID I");
-    SysTick->LOAD = 16000000; // period
+    SysTick->LOAD = 1600000; // period, change later
     SysTick->VAL = 0;
     SysTick->CTRL =
         SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
@@ -52,10 +53,6 @@ __attribute__((naked, used)) void PendSV_Handler()
 {
     asm volatile("CPSID I");
     if (--scheduler.slices_remaining > 0) {
-        printf(
-            "Task %d has %d slices remaining\n", scheduler.current_task_index,
-            scheduler.slices_remaining
-        );
         goto END;
     }
 
@@ -83,6 +80,15 @@ __attribute__((naked, used)) void PendSV_Handler()
                  "sub r0,#96\n"
                  "ldm r0!,{r4-r11}\n");
 END:
+    // Always want to call drivers on context switch
+    // Note: this is probably not what will call callbacks
+    drivers::driver_controller.do_work();
+
+    // printf(
+    //     "Task %d has %d slices remaining\n", scheduler.current_task_index,
+    //     scheduler.slices_remaining
+    // );
+
     asm volatile("CPSIE I\n"
                  "ldr r0,=0xfffffffd\n"
                  "bx r0");

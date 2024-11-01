@@ -7,8 +7,8 @@ namespace edge::drivers {
 
 // Synchronous
 class LedDisplay {
-    static constexpr size_t WIDTH = 5;
-    static constexpr size_t HEIGHT = 5;
+    static constexpr uint8_t WIDTH = 5;
+    static constexpr uint8_t HEIGHT = 5;
 
     etl::array<etl::array<bool, WIDTH>, HEIGHT> led_enabled{};
 
@@ -28,7 +28,7 @@ class LedDisplay {
         GPIOPin{LED_COL5, OUT}
     };
 
-    void set_output(size_t row, size_t col, bool enabled)
+    void set_output(uint8_t row, uint8_t col, bool enabled)
     {
         led_rows[row].write(enabled);
         led_cols[col].write(!enabled);
@@ -41,19 +41,19 @@ public:
         etl::for_each(led_cols.begin(), led_cols.end(), [](auto& col) { col.set(); });
     }
 
-    void set_led(size_t row, size_t col, bool enabled)
+    void set_led(uint8_t row, uint8_t col, bool enabled)
     {
         led_enabled[row][col] = enabled;
     }
 
-    void do_work()
+    void display_pixels_once()
     {
-        for (size_t row = 0; row < HEIGHT; row++) {
-            for (size_t col = 0; col < WIDTH; col++) {
+        for (uint8_t row = 0; row < HEIGHT; row++) {
+            for (uint8_t col = 0; col < WIDTH; col++) {
                 if (led_enabled[row][col]) {
                     set_output(row, col, true);
                 }
-                nrf_delay_us(10);
+                nrf_delay_us(200);
                 if (led_enabled[row][col]) {
                     set_output(row, col, false);
                 }

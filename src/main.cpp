@@ -1,68 +1,38 @@
-#include "drivers/led_display.hpp"
 #include "nrf_delay.h"
 #include "scheduler.hpp"
-#include "syscalls.hpp"
 #include "timer.hpp"
+#include "userlib/syscalls.hpp"
 
 #include <stdbool.h>
 #include <stdio.h>
 
 // Pin configurations
 
-static constexpr auto TASK0_PRIO = 20;
-static constexpr auto TASK1_PRIO = 20;
-static constexpr auto TASK2_PRIO = 20;
+static constexpr auto TASK0_PRIO = 1;
+static constexpr auto TASK1_PRIO = 50;
 
-int i = 0;
-int j = 0;
-
-void task0(void)
+template <int N>
+void task(void)
 {
-    edge::drivers::LedDisplay display;
+    edge::userlib::change_priority(1);
+    int j = 0;
     while (1) {
-        if (i++ % 200 == 0) {
-            display.set_led(j % 5, (j % 25) / 5, false);
-            j++;
-            display.set_led(j % 5, (j % 25) / 5, true);
-        }
-        display.do_work();
-    }
-}
-
-// Demonstrates priority change
-void task1(void)
-{
-    edge::drivers::LedDisplay display;
-    while (1) {
-        if (i++ % 200 == 0) {
-            display.set_led((j % 5), ((j % 25) / 5), false);
-            j++;
-            display.set_led(4 - (j % 5), 4 - ((j % 25) / 5), true);
-        }
-        display.do_work();
-    }
-}
-
-// Demonstrates yielding
-// Toggle LED then yield
-void task2(void)
-{
-    // edge::drivers::GPIOPin col3(LED_COL3, edge::drivers::GPIOConfiguration::OUT);
-    while (1) {
-        // col3.toggle();
-        edge::userlib::yield();
+        edge::userlib::set_led((N + j) % 5, N, false);
+        j++;
+        edge::userlib::set_led((N + j) % 5, N, true);
+        nrf_delay_ms(25);
     }
 }
 
 int main(void)
 {
-    // edge::KernelTimerController::get_instance();
-
     printf("Starting EdgeOS\n");
 
-    edge::scheduler.add_task(task0, TASK0_PRIO);
-    edge::scheduler.add_task(task1, TASK1_PRIO);
-    edge::scheduler.add_task(task2, TASK2_PRIO);
+    edge::scheduler.add_task(task<0>);
+    edge::scheduler.add_task(task<1>);
+    edge::scheduler.add_task(task<2>);
+    edge::scheduler.add_task(task<3>);
+    edge::scheduler.add_task(task<4>);
 
     edge::scheduler.start_scheduler();
 

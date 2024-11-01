@@ -6,7 +6,7 @@
 
 static constexpr auto MAX_PROCESSES = 5;
 static constexpr size_t STACK_SIZE_BYTES = 2048;
-static constexpr size_t QUANTUM_MILLIS = 10;
+static constexpr size_t QUANTUM_MILLIS = 10; // TODO: actually use lol
 
 namespace edge {
 extern "C" {
@@ -23,7 +23,6 @@ class Scheduler {
         const unsigned RETURN_ADDR;
         const unsigned FLAG;
         const unsigned SOFTWARE_REGS[8]{};
-        const unsigned FPU_REGS[16]{};
 
         saved_registers(unsigned return_addr, unsigned flag = 0x01000000) :
             RETURN_ADDR(return_addr), FLAG(flag)
