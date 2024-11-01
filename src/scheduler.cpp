@@ -6,8 +6,7 @@ namespace edge {
 
 Scheduler scheduler;
 
-void
-Scheduler::start_scheduler()
+void Scheduler::start_scheduler()
 {
     asm("CPSID I");
     SysTick->LOAD = 16000000; // period
@@ -21,16 +20,14 @@ Scheduler::start_scheduler()
     asm("SVC #0");
 }
 
-void
-Scheduler::add_task(void (*function)(void), uint8_t priority)
+void Scheduler::add_task(void (*function)(void), uint8_t priority)
 {
     task_stack.emplace_back(
         process_metadata{reinterpret_cast<unsigned>(function)}, priority
     );
 }
 
-void
-Scheduler::handle_first_svc_hit()
+void Scheduler::handle_first_svc_hit()
 {
     // Unprivileged Mode
     __set_CONTROL(0x03);
@@ -41,8 +38,7 @@ Scheduler::handle_first_svc_hit()
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 }
 
-void
-Scheduler::change_current_task_priority(uint8_t new_priority)
+void Scheduler::change_current_task_priority(uint8_t new_priority)
 {
     task_stack[current_task_index].priority = new_priority;
     slices_remaining = etl::min(slices_remaining, new_priority);
@@ -51,8 +47,8 @@ Scheduler::change_current_task_priority(uint8_t new_priority)
 
 extern "C" {
 
-__attribute__((naked, used)) void
-PendSV_Handler()
+__attribute__((naked, used)) void PendSV_Handler()
+
 {
     asm("CPSID I");
 
@@ -109,23 +105,22 @@ END:
     asm("bx r0");
 }
 
-void trigger_pendsv() {
+void trigger_pendsv()
+{
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 }
 
-__attribute__((used)) void
-SysTick_Handler()
+__attribute__((used)) void SysTick_Handler()
 {
-	trigger_pendsv();
+    trigger_pendsv();
 }
 }
 
-void
-Scheduler::yield_current_task()
+void Scheduler::yield_current_task()
 {
     printf("Task %d yielded\n", current_task_index);
     slices_remaining = 1;
-	trigger_pendsv();
+    trigger_pendsv();
 }
 
 } // namespace edge
