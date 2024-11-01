@@ -1,9 +1,12 @@
 #include "scheduler.hpp"
 
+#include "system_call_type.hpp"
+
 namespace edge {
 
-void
-Scheduler::start_scheduler()
+Scheduler scheduler;
+
+void Scheduler::start_scheduler()
 {
     asm("CPSID I");
     SysTick->LOAD = 16000000; // period
@@ -17,25 +20,14 @@ Scheduler::start_scheduler()
     asm("SVC #0");
 }
 
-void
-Scheduler::handle_priority_change()
+void Scheduler::add_task(void (*function)(void), uint8_t priority)
 {
-    uint8_t new_prio = 0;
-    uint16_t* PC_reg;
-
-    uint32_t* SP_reg;
-    asm("MRS %0,PSP" : "=r"(SP_reg));
-
-    // this is bad. fix
-    PC_reg = reinterpret_cast<uint16_t*>(SP_reg[6]);
-    new_prio = PC_reg[-1] & 0xFF;
-
-    task_stack[current_task_index].priority = new_prio;
-    printf("Task %d requested new priority %d\n", current_task_index, new_prio);
+    task_stack.emplace_back(
+        process_metadata{reinterpret_cast<unsigned>(function)}, priority
+    );
 }
 
-void
-Scheduler::handle_first_svc_hit()
+void Scheduler::handle_first_svc_hit()
 {
     // Unprivileged Mode
     __set_CONTROL(0x03);
@@ -46,55 +38,24 @@ Scheduler::handle_first_svc_hit()
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 }
 
-void
-Scheduler::advance_turn()
+void Scheduler::change_current_task_priority(uint8_t new_priority)
 {
-    // This function will dirty registers. That's okay
-
-    task_stack[current_task_index].stack_ptr_loc = (unsigned*)__get_PSP();
-
-    current_task_index =
-        (current_task_index >= task_stack.size() - 1) ? 0 : current_task_index + 1;
-
-    slices_remaining = task_stack[current_task_index].priority;
-
-    __set_PSP((unsigned)task_stack[current_task_index].stack_ptr_loc);
-}
-
-bool
-Scheduler::continue_current_task()
-{
-    return --slices_remaining > 0;
-}
-
-void
-Scheduler::print_info() const
-{
-    printf("Task %d has %d slices remaining\n", current_task_index, slices_remaining);
-}
-
-void
-Scheduler::add_task(void (*function)(void), uint8_t priority)
-{
-    task_stack.emplace_back(
-        process_metadata{reinterpret_cast<unsigned>(function)}, priority
-    );
+    task_stack[current_task_index].priority = new_priority;
+    slices_remaining = etl::min(slices_remaining, new_priority);
+    printf("Task %d requested new priority %d\n", current_task_index, new_priority);
 }
 
 extern "C" {
-void
-print_task_info(void)
-{
-    scheduler.print_info();
-}
 
-__attribute__((naked)) void
-PendSV_Handler()
+__attribute__((naked, used)) void PendSV_Handler()
 {
     asm("CPSID I");
 
-    if (scheduler.continue_current_task()) {
-        asm("bl print_task_info");
+    if (--scheduler.slices_remaining > 0) {
+        printf(
+            "Task %d has %d slices remaining\n", scheduler.current_task_index,
+            scheduler.slices_remaining
+        );
         goto END;
     }
 
@@ -108,7 +69,21 @@ PendSV_Handler()
     asm("mov r7,r11");
     asm("stm r0!,{r4,r5,r6,r7}");
 
-    scheduler.advance_turn();
+    // This function will dirty registers. That's okay
+    scheduler.task_stack[scheduler.current_task_index].stack_ptr_loc =
+        reinterpret_cast<unsigned*>(__get_PSP());
+
+    scheduler.current_task_index =
+        (scheduler.current_task_index >= scheduler.task_stack.size() - 1)
+            ? 0
+            : scheduler.current_task_index + 1;
+
+    scheduler.slices_remaining =
+        scheduler.task_stack[scheduler.current_task_index].priority;
+
+    __set_PSP(reinterpret_cast<unsigned>(
+        scheduler.task_stack[scheduler.current_task_index].stack_ptr_loc
+    ));
 
     // Restore next context
     asm("mrs r0,psp");
@@ -129,26 +104,22 @@ END:
     asm("bx r0");
 }
 
-void
-SysTick_Handler()
+void trigger_pendsv()
 {
-    // Trigger PENDSV
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 }
 
-// Triggered on program start, as well as when process wants to change priority
-void
-SVC_Handler()
+__attribute__((used)) void SysTick_Handler()
 {
-    static bool first_svc_hit = true;
-    if (first_svc_hit) {
-        scheduler.handle_first_svc_hit();
-        first_svc_hit = false;
-    }
-    else {
-        scheduler.handle_priority_change();
-    }
+    trigger_pendsv();
 }
 }
-edge::Scheduler scheduler;
+
+void Scheduler::yield_current_task()
+{
+    printf("Task %d yielded\n", current_task_index);
+    slices_remaining = 1;
+    trigger_pendsv();
+}
+
 } // namespace edge

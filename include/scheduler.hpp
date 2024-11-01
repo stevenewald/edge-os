@@ -4,6 +4,8 @@
 
 #include <stdio.h>
 
+#include <cstdint>
+
 static constexpr auto MAX_PROCESSES = 10;
 static constexpr size_t STACK_SIZE_BYTES = 2048;
 static constexpr size_t QUANTUM_MILLIS = 10;
@@ -52,17 +54,12 @@ public:
     void add_task(void (*function)(void), uint8_t priority = 1);
 
     void start_scheduler();
+    void change_current_task_priority(uint8_t new_priority);
 
-    void print_info() const;
+    void yield_current_task();
 
 private:
-    bool continue_current_task();
-
-    void advance_turn();
-
     void handle_first_svc_hit();
-
-    void handle_priority_change();
 
     friend void PendSV_Handler(void);
     friend void SVC_Handler(void);

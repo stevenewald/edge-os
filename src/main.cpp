@@ -1,10 +1,12 @@
+#include "gpio_pin.hpp"
+#include "gpio_wrapper.hpp"
 #include "nrf_delay.h"
 #include "nrf_gpio.h"
 #include "scheduler.hpp"
+#include "syscalls.hpp"
 #include "timer.hpp"
 
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
 
 // Pin configurations
@@ -14,52 +16,42 @@ static constexpr auto TASK0_PRIO = 5;
 static constexpr auto TASK1_PRIO = 10;
 static constexpr auto TASK2_PRIO = 20;
 
-void
-task0(void)
+void task0(void)
 {
-    // Change priority (optional)
-    asm("SVC #14");
-
-    nrf_gpio_cfg_output(LED_COL1);
-    int i = 0;
+    edge::drivers::GPIOPin col1(LED_COL1, edge::drivers::GPIOConfiguration::OUT);
     while (1) {
-        if (i++ % 300000 == 0)
-            nrf_gpio_pin_toggle(LED_COL1);
+        col1.toggle();
     }
 }
 
-void
-task1(void)
+// Demonstrates priority change
+void task1(void)
 {
-    nrf_gpio_cfg_output(LED_COL2);
-    int i = 0;
+    edge::userlib::change_priority(2);
+    edge::drivers::GPIOPin col2(LED_COL2, edge::drivers::GPIOConfiguration::OUT);
+    col2.set();
     while (1) {
-        if (i++ % 300000 == 0)
-            nrf_gpio_pin_toggle(LED_COL2);
+        col2.toggle();
     }
 }
 
-void
-task2(void)
+// Demonstrates yielding
+// Toggle LED then yield
+void task2(void)
 {
-    nrf_gpio_cfg_output(LED_COL3);
-    int i = 0;
+    /* edge::aidan::set_gpio_output(LED_COL3); */
+    edge::drivers::GPIOPin col3(LED_COL3, edge::drivers::GPIOConfiguration::OUT);
     while (1) {
-        if (i++ % 300000 == 0)
-            nrf_gpio_pin_toggle(LED_COL3);
+        col3.toggle();
+        edge::userlib::yield();
     }
 }
 
-int
-main(void)
+int main(void)
 {
-    // Initialize.
-    // nrf_gpio_cfg_output(LED_MIC);
-
     // edge::KernelTimerController::get_instance();
 
-    // Enter main loop.
-    printf("Starting\n");
+    printf("Starting EdgeOS\n");
     nrf_gpio_cfg_output(LED_ROW1);
     nrf_gpio_pin_set(LED_ROW1);
 

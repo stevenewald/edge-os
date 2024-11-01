@@ -20,15 +20,13 @@ class KernelTimerController {
     uint32_t clock_wraps_;
 
 public:
-    static KernelTimerController&
-    get_instance()
+    static KernelTimerController& get_instance()
     {
         static KernelTimerController controller;
         return controller;
     }
 
-    uint32_t
-    get_time()
+    uint32_t get_time()
     {
         nrf_timer_task_trigger(TIMER, NRF_TIMER_TASK_CAPTURE0);
         return nrf_timer_cc_read(TIMER, NRF_TIMER_CC_CHANNEL0);
@@ -37,8 +35,7 @@ public:
 private:
     KernelTimerController() { initialize_timer_(); }
 
-    static CallbackType
-    event_triggered_()
+    static CallbackType event_triggered_()
     {
         if (nrf_timer_event_check(TIMER, NRF_TIMER_EVENT_COMPARE0)) [[unlikely]] {
             return GET_TIME;
@@ -52,8 +49,7 @@ private:
         }
     }
 
-    static void
-    clear_event_(CallbackType type)
+    static void clear_event_(CallbackType type)
     {
         switch (type) {
             case GET_TIME:
@@ -65,8 +61,7 @@ private:
         }
     }
 
-    static void
-    initialize_timer_()
+    static void initialize_timer_()
     {
         // High frequency timer
         nrf_timer_frequency_set(TIMER, TIMER_FREQUENCY);
@@ -79,11 +74,7 @@ private:
         nrf_timer_int_enable(TIMER, NRF_TIMER_INT_COMPARE1_MASK);
     }
 
-    void
-    mark_clock_wrapped()
-    {
-        clock_wraps_++;
-    }
+    void mark_clock_wrapped() { clock_wraps_++; }
 
     friend void ::TIMER4_IRQHandler(void);
 };

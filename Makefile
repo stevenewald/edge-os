@@ -23,3 +23,17 @@ include external/microbit_v2/Board.mk
 # Include main Makefile
 include $(NRF_BASE_DIR)/make/AppMakefile.mk
 
+
+CPP_FILES := $(wildcard src/*.cpp include/*.hpp)
+
+.PHONY: format
+format:
+	clang-format -style=file -i $(CPP_FILES)
+
+.PHONY: tidy
+tidy:
+	clang-tidy $(CPP_FILES) -- -std=c++20
+
+.PHONY: lint
+lint: format tidy
+

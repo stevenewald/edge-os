@@ -1,3 +1,8 @@
+# Edge OS
+
+C++ embedded operating system for the NRF52 family of Microcontrollers.
+
+
 # Building
 
 1. Install `bear` and `arm-none-eabi-gcc` relevant to your system. Ensure both the C and C++ compilers for `arm-none-eabi-gcc` are installed.
