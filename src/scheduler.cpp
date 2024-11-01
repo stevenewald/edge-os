@@ -48,6 +48,7 @@ void Scheduler::change_current_task_priority(uint8_t new_priority)
 extern "C" {
 
 __attribute__((naked, used)) void PendSV_Handler()
+
 {
     asm("CPSID I");
 
