@@ -1,7 +1,5 @@
 #pragma once
 
-#include "nrf52833.h"
-
 #include <stdio.h>
 
 #include <cstdint>
@@ -25,6 +23,7 @@ class Scheduler {
         const unsigned RETURN_ADDR;
         const unsigned FLAG;
         const unsigned SOFTWARE_REGS[8]{};
+        const unsigned FPU_REGS[16]{};
 
         saved_registers(unsigned return_addr, unsigned flag = 0x01000000) :
             RETURN_ADDR(return_addr), FLAG(flag)

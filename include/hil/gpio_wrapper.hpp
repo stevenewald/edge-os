@@ -24,6 +24,11 @@ inline void clear_gpio_pin(uint32_t pin_number)
     nrf_gpio_pin_clear(pin_number);
 }
 
+inline void write_gpio_pin(uint32_t pin_number, uint32_t value)
+{
+    nrf_gpio_pin_write(pin_number, value);
+}
+
 inline void toggle_gpio_pin(uint32_t pin_number)
 {
     nrf_gpio_pin_toggle(pin_number);

@@ -1,6 +1,6 @@
 #include "scheduler.hpp"
 
-#include "system_call_type.hpp"
+#include "nrf52833.h"
 
 namespace edge {
 
@@ -60,7 +60,7 @@ __attribute__((naked, used)) void PendSV_Handler()
     }
 
     asm volatile("mrs r0,psp\n"
-                 "sub r0,#16\n"
+                 "sub r0,#96\n"
                  "stm r0!,{r4-r11}");
 
     // This function will dirty registers. That's okay
@@ -80,7 +80,7 @@ __attribute__((naked, used)) void PendSV_Handler()
     ));
 
     asm volatile("mrs r0,psp\n"
-                 "sub r0,#16\n"
+                 "sub r0,#96\n"
                  "ldm r0!,{r4-r11}\n");
 END:
     asm volatile("CPSIE I\n"

@@ -24,6 +24,7 @@ __attribute__((used)) void SVC_Handler(void)
     if (!has_hit) {
         scheduler.handle_first_svc_hit();
         has_hit = true;
+        return;
     }
     uint32_t* SP_reg;
     asm("MRS %0,PSP" : "=r"(SP_reg));

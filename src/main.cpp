@@ -1,7 +1,5 @@
-#include "gpio_pin.hpp"
-#include "gpio_wrapper.hpp"
+#include "drivers/led_display.hpp"
 #include "nrf_delay.h"
-#include "nrf_gpio.h"
 #include "scheduler.hpp"
 #include "syscalls.hpp"
 #include "timer.hpp"
@@ -10,29 +8,38 @@
 #include <stdio.h>
 
 // Pin configurations
-#include "microbit_v2.h"
 
-static constexpr auto TASK0_PRIO = 10;
-static constexpr auto TASK1_PRIO = 10;
-static constexpr auto TASK2_PRIO = 10;
+static constexpr auto TASK0_PRIO = 20;
+static constexpr auto TASK1_PRIO = 20;
+static constexpr auto TASK2_PRIO = 20;
+
+int i = 0;
+int j = 0;
 
 void task0(void)
 {
-    edge::drivers::GPIOPin col1(LED_COL1, edge::drivers::GPIOConfiguration::OUT);
-	int i = 0;
+    edge::drivers::LedDisplay display;
     while (1) {
-        if (i++ % 1000000 == 0)
-            col1.toggle();
+        if (i++ % 200 == 0) {
+            display.set_led(j % 5, (j % 25) / 5, false);
+            j++;
+            display.set_led(j % 5, (j % 25) / 5, true);
+        }
+        display.do_work();
     }
 }
 
 // Demonstrates priority change
 void task1(void)
 {
-    edge::drivers::GPIOPin col2(LED_COL2, edge::drivers::GPIOConfiguration::OUT);
-    col2.set();
+    edge::drivers::LedDisplay display;
     while (1) {
-        col2.toggle();
+        if (i++ % 200 == 0) {
+            display.set_led((j % 5), ((j % 25) / 5), false);
+            j++;
+            display.set_led(4 - (j % 5), 4 - ((j % 25) / 5), true);
+        }
+        display.do_work();
     }
 }
 
@@ -40,9 +47,9 @@ void task1(void)
 // Toggle LED then yield
 void task2(void)
 {
-    edge::drivers::GPIOPin col3(LED_COL3, edge::drivers::GPIOConfiguration::OUT);
+    // edge::drivers::GPIOPin col3(LED_COL3, edge::drivers::GPIOConfiguration::OUT);
     while (1) {
-        col3.toggle();
+        // col3.toggle();
         edge::userlib::yield();
     }
 }
@@ -52,8 +59,6 @@ int main(void)
     // edge::KernelTimerController::get_instance();
 
     printf("Starting EdgeOS\n");
-    nrf_gpio_cfg_output(LED_ROW1);
-    nrf_gpio_pin_set(LED_ROW1);
 
     edge::scheduler.add_task(task0, TASK0_PRIO);
     edge::scheduler.add_task(task1, TASK1_PRIO);
