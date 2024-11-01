@@ -12,22 +12,23 @@
 // Pin configurations
 #include "microbit_v2.h"
 
-static constexpr auto TASK0_PRIO = 5;
+static constexpr auto TASK0_PRIO = 10;
 static constexpr auto TASK1_PRIO = 10;
-static constexpr auto TASK2_PRIO = 20;
+static constexpr auto TASK2_PRIO = 10;
 
 void task0(void)
 {
     edge::drivers::GPIOPin col1(LED_COL1, edge::drivers::GPIOConfiguration::OUT);
+	int i = 0;
     while (1) {
-        col1.toggle();
+        if (i++ % 1000000 == 0)
+            col1.toggle();
     }
 }
 
 // Demonstrates priority change
 void task1(void)
 {
-    edge::userlib::change_priority(2);
     edge::drivers::GPIOPin col2(LED_COL2, edge::drivers::GPIOConfiguration::OUT);
     col2.set();
     while (1) {
@@ -39,7 +40,6 @@ void task1(void)
 // Toggle LED then yield
 void task2(void)
 {
-    /* edge::aidan::set_gpio_output(LED_COL3); */
     edge::drivers::GPIOPin col3(LED_COL3, edge::drivers::GPIOConfiguration::OUT);
     while (1) {
         col3.toggle();

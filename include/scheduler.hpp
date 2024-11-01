@@ -6,7 +6,7 @@
 
 #include <cstdint>
 
-static constexpr auto MAX_PROCESSES = 10;
+static constexpr auto MAX_PROCESSES = 5;
 static constexpr size_t STACK_SIZE_BYTES = 2048;
 static constexpr size_t QUANTUM_MILLIS = 10;
 
@@ -20,13 +20,13 @@ class Scheduler {
     unsigned current_task_index = 0;
     uint8_t slices_remaining = 1;
 
-    struct process_metadata {
-        const unsigned RESERVED1[5]{};
+    struct saved_registers {
+        const unsigned HARDWARE_REGS[5]{};
         const unsigned RETURN_ADDR;
         const unsigned FLAG;
-        const unsigned RESERVED2[2]{};
+        const unsigned SOFTWARE_REGS[8]{};
 
-        process_metadata(unsigned return_addr, unsigned flag = 0x01000000) :
+        saved_registers(unsigned return_addr, unsigned flag = 0x01000000) :
             RETURN_ADDR(return_addr), FLAG(flag)
         {}
     };
@@ -37,13 +37,13 @@ class Scheduler {
 
         // ===== DO NOT REARRANGE THESE =====
         etl::array<unsigned, STACK_SIZE_IN_UNSIGNED> stack{};
-        process_metadata METADATA;
+        saved_registers METADATA;
         // ==================================
 
         unsigned* stack_ptr_loc{&stack.back()};
         uint8_t priority;
 
-        task(const process_metadata& metadata, uint8_t initial_priority) :
+        task(const saved_registers& metadata, uint8_t initial_priority) :
             METADATA(metadata), priority(initial_priority)
         {}
     };
