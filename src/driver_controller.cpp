@@ -3,6 +3,8 @@
 #include "drivers/led_display.hpp"
 #include "drivers/timer.hpp"
 
+#include <stdio.h>
+
 namespace edge::drivers {
 void do_work()
 {
@@ -17,6 +19,9 @@ etl::optional<int> handle_command(DriverType type, int arg1, int arg2, int arg3)
             break;
         case DriverType::GET_TIME:
             return timer4_controller.get_time_ns();
+        case DriverType::TERMINAL_OUTPUT:
+            printf((char*)arg1);
+            break;
     }
     return etl::nullopt;
 }

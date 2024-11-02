@@ -4,7 +4,7 @@
 
 #include <cstdint>
 
-static constexpr auto MAX_PROCESSES = 5;
+static constexpr auto MAX_PROCESSES = 10;
 static constexpr size_t STACK_SIZE_BYTES = 2048;
 static constexpr size_t QUANTUM_MILLIS = 10; // TODO: actually use lol
 

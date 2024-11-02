@@ -23,6 +23,16 @@ void task(void)
     }
 }
 
+void print_time(void)
+{
+    while (1) {
+        etl::string<50> str;
+        etl::to_string(edge::userlib::get_time(), str);
+        edge::userlib::debug_println(str);
+        edge::userlib::yield();
+    }
+}
+
 int main(void)
 {
     printf("Starting EdgeOS\n");
@@ -32,6 +42,8 @@ int main(void)
     edge::scheduler.add_task(task<2>);
     edge::scheduler.add_task(task<3>);
     edge::scheduler.add_task(task<4>);
+
+    edge::scheduler.add_task(print_time);
 
     edge::scheduler.start_scheduler();
 }

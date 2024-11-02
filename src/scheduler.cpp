@@ -65,7 +65,7 @@ __attribute__((naked, used)) void PendSV_Handler()
         reinterpret_cast<unsigned*>(__get_PSP());
 
     scheduler.current_task_index =
-        (scheduler.current_task_index >= scheduler.task_stack.size() - 1)
+        (scheduler.current_task_index == scheduler.task_stack.size() - 1)
             ? 0
             : scheduler.current_task_index + 1;
 

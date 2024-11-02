@@ -35,4 +35,11 @@ int get_time()
     READ_REGISTER(r0, ret);
     return ret;
 }
+
+void debug_print(const char* val)
+{
+    SET_REGISTER(r0, (int)drivers::DriverType::TERMINAL_OUTPUT);
+    SET_REGISTER(r1, (int)val);
+    TRIGGER_SVC(SystemCallType::COMMAND);
+}
 } // namespace edge::userlib
