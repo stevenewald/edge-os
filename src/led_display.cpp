@@ -35,4 +35,6 @@ void LedDisplay::display_pixels_once()
         }
     }
 }
+
+LedDisplay led_display;
 } // namespace edge::drivers

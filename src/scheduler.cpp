@@ -82,7 +82,7 @@ __attribute__((naked, used)) void PendSV_Handler()
 END:
     // Always want to call drivers on context switch
     // Note: this is probably not what will call callbacks
-    drivers::driver_controller.do_work();
+    drivers::do_work();
 
     // printf(
     //     "Task %d has %d slices remaining\n", scheduler.current_task_index,

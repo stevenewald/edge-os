@@ -36,4 +36,6 @@ public:
 
     void display_pixels_once();
 };
+
+extern LedDisplay led_display;
 } // namespace edge::drivers

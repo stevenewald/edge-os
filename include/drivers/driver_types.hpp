@@ -2,7 +2,7 @@
 
 namespace edge::drivers {
 enum class DriverType {
-    GPIO,
-    LED_DISPLAY,
+    GET_TIME = 0,
+    LED_DISPLAY = 1,
 };
 }

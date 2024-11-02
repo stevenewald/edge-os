@@ -26,4 +26,13 @@ void set_led(uint8_t row, uint8_t col, bool enabled)
     SET_REGISTER(r3, (int)enabled);
     TRIGGER_SVC(SystemCallType::COMMAND);
 }
+
+int get_time()
+{
+    SET_REGISTER(r0, (int)drivers::DriverType::GET_TIME);
+    TRIGGER_SVC(SystemCallType::COMMAND);
+    int ret;
+    READ_REGISTER(r0, ret);
+    return ret;
+}
 } // namespace edge::userlib

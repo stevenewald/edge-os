@@ -8,4 +8,6 @@ void yield();
 
 void set_led(uint8_t row, uint8_t col, bool enabled);
 
+int get_time();
+
 } // namespace edge::userlib
