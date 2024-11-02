@@ -6,7 +6,7 @@
 
 namespace edge::drivers {
 
-void do_work();
+void do_async_work();
 
 etl::optional<int> handle_command(DriverType type, int arg1, int arg2, int arg3);
 

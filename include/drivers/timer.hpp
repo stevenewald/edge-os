@@ -20,7 +20,7 @@ class Timer4Controller {
     uint32_t clock_wraps_;
 
 public:
-    uint32_t get_time_ns()
+    uint32_t get_time_us()
     {
         nrf_timer_task_trigger(TIMER, NRF_TIMER_TASK_CAPTURE0);
         return nrf_timer_cc_read(TIMER, NRF_TIMER_CC_CHANNEL0) / 16;

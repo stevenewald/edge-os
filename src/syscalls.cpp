@@ -27,7 +27,7 @@ void set_led(uint8_t row, uint8_t col, bool enabled)
     TRIGGER_SVC(SystemCallType::COMMAND);
 }
 
-int get_time()
+int get_time_us()
 {
     SET_REGISTER(r0, (int)drivers::DriverType::GET_TIME);
     TRIGGER_SVC(SystemCallType::COMMAND);

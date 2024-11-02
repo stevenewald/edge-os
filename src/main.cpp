@@ -13,21 +13,30 @@ static constexpr auto TASK1_PRIO = 50;
 template <int N>
 void task(void)
 {
-    edge::userlib::change_priority(1);
+	using edge::userlib::change_priority;
+	using edge::userlib::set_led;
+	using edge::userlib::get_time_us;
+    change_priority(1);
     int j = 0;
     while (1) {
-        edge::userlib::set_led((N + j) % 5, N, false);
+        set_led(4 - (N + j) % 5, 4 - N, false);
+        set_led((N + j) % 5, N, false);
         j++;
-        edge::userlib::set_led((N + j) % 5, N, true);
-        nrf_delay_ms(25);
+        if (get_time_us()/2'000'000 & 1) {
+            set_led((N + j) % 5, N, true);
+        }
+        else {
+            set_led(4 - (N + j) % 5, 4 - N, true);
+        }
+        nrf_delay_ms(15);
     }
 }
 
-void print_time(void)
+[[maybe_unused]] void print_time(void)
 {
     while (1) {
         etl::string<50> str;
-        etl::to_string(edge::userlib::get_time(), str);
+        etl::to_string(edge::userlib::get_time_us(), str);
         edge::userlib::debug_println(str);
         edge::userlib::yield();
     }
@@ -42,8 +51,6 @@ int main(void)
     edge::scheduler.add_task(task<2>);
     edge::scheduler.add_task(task<3>);
     edge::scheduler.add_task(task<4>);
-
-    edge::scheduler.add_task(print_time);
 
     edge::scheduler.start_scheduler();
 }

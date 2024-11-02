@@ -25,13 +25,12 @@ void LedDisplay::display_pixels_once()
 {
     for (uint8_t row = 0; row < HEIGHT; row++) {
         for (uint8_t col = 0; col < WIDTH; col++) {
-            if (led_enabled[row][col]) {
-                set_output(row, col, true);
+            if (!led_enabled[row][col]) {
+                continue;
             }
+            set_output(row, col, true);
             nrf_delay_us(200);
-            if (led_enabled[row][col]) {
-                set_output(row, col, false);
-            }
+            set_output(row, col, false);
         }
     }
 }

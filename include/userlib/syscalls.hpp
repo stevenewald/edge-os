@@ -8,7 +8,7 @@ void yield();
 
 void set_led(uint8_t row, uint8_t col, bool enabled);
 
-int get_time();
+int get_time_us();
 
 // We need a syscall for this because SVC will not be preempted by SysTick
 // Technically this is insecure - it's mostly for debugging
