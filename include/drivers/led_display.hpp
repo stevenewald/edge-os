@@ -1,7 +1,6 @@
 #pragma once
-#include "gpio_pin.hpp"
+#include "drivers/gpio_pin.hpp"
 #include "microbit_v2.h"
-#include "nrf_delay.h"
 
 namespace edge::drivers {
 
@@ -28,37 +27,13 @@ class LedDisplay {
         GPIOPin{LED_COL5, OUT}
     };
 
-    void set_output(uint8_t row, uint8_t col, bool enabled)
-    {
-        led_rows[row].write(enabled);
-        led_cols[col].write(!enabled);
-    }
+    void set_output(uint8_t row, uint8_t col, bool enabled);
 
 public:
-    LedDisplay()
-    {
-        etl::for_each(led_rows.begin(), led_rows.end(), [](auto& row) { row.clear(); });
-        etl::for_each(led_cols.begin(), led_cols.end(), [](auto& col) { col.set(); });
-    }
+    LedDisplay();
 
-    void set_led(uint8_t row, uint8_t col, bool enabled)
-    {
-        led_enabled[row][col] = enabled;
-    }
+    void set_led(uint8_t row, uint8_t col, bool enabled);
 
-    void display_pixels_once()
-    {
-        for (uint8_t row = 0; row < HEIGHT; row++) {
-            for (uint8_t col = 0; col < WIDTH; col++) {
-                if (led_enabled[row][col]) {
-                    set_output(row, col, true);
-                }
-                nrf_delay_us(200);
-                if (led_enabled[row][col]) {
-                    set_output(row, col, false);
-                }
-            }
-        }
-    }
+    void display_pixels_once();
 };
 } // namespace edge::drivers
