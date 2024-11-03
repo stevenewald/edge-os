@@ -8,6 +8,10 @@ SOFTDEVICE_MODEL = blank
 # ETL
 ETL_INCLUDES = ./external/etl/include/etl/array.h
 ETL_INCLUDES += ./external/etl/include/etl/vector.h
+ETL_INCLUDES += ./external/etl/include/etl/optional.h
+ETL_INCLUDES += ./external/etl/include/etl/string.h
+ETL_INCLUDES += ./external/etl/include/etl/string_stream.h
+ETL_INCLUDES += ./external/etl/include/etl/to_string.h
 
 # Source and header files
 APP_HEADER_PATHS += ./include

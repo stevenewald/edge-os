@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gpio_wrapper.hpp"
+#include "hil/gpio_wrapper.hpp"
 #include "stdint.h"
 
 namespace edge {
@@ -34,6 +34,8 @@ public:
     void clear() { aidan::clear_gpio_pin(pin_number); }
 
     void set() { aidan::set_gpio_pin(pin_number); }
+
+    void write(uint32_t value) { aidan::write_gpio_pin(pin_number, value); }
 
     bool read() { return aidan::read_gpio_pin(pin_number); }
 

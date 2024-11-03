@@ -1,20 +1,41 @@
-#include "register_utils.hpp"
+#include "drivers/driver_controller.hpp"
 #include "scheduler.hpp"
-#include "system_call_type.hpp"
+#include "userlib/system_call_type.hpp"
 
 #include <cstdio>
 
 namespace edge {
-void handle_priority_change()
-{
-    unsigned int new_priority;
-    READ_REGISTER(r0, new_priority);
-    scheduler.change_current_task_priority(new_priority);
-}
 
 void handle_yield()
 {
     scheduler.yield_current_task();
+}
+
+void handle_change_priority(uint32_t* stack_ptr)
+{
+    scheduler.change_current_task_priority(stack_ptr[0]);
+}
+
+etl::optional<int> handle_driver_command(uint32_t* stack_ptr)
+{
+    auto type = static_cast<drivers::DriverType>(stack_ptr[0]);
+    return drivers::handle_command(type, stack_ptr[1], stack_ptr[2], stack_ptr[3]);
+}
+
+etl::optional<int> handle_call(uint32_t* stack_ptr)
+{
+    auto call_type = static_cast<SystemCallType>(((char*)stack_ptr[6])[-2]);
+    switch (call_type) {
+        case SystemCallType::CHANGE_PRIORITY:
+            handle_change_priority(stack_ptr);
+            break;
+        case SystemCallType::YIELD:
+            handle_yield();
+            break;
+        case SystemCallType::COMMAND:
+            return handle_driver_command(stack_ptr);
+    }
+    return etl::nullopt;
 }
 
 extern "C" {
@@ -24,17 +45,13 @@ __attribute__((used)) void SVC_Handler(void)
     if (!has_hit) {
         scheduler.handle_first_svc_hit();
         has_hit = true;
+        return;
     }
     uint32_t* SP_reg;
     asm("MRS %0,PSP" : "=r"(SP_reg));
-    auto call_type = static_cast<SystemCallType>(((char*)SP_reg[6])[-2]);
-    switch (call_type) {
-        case SystemCallType::CHANGE_PRIORITY:
-            handle_priority_change();
-            break;
-        case SystemCallType::YIELD:
-            handle_yield();
-            break;
+    auto ret_opt = handle_call(SP_reg);
+    if (ret_opt) {
+        SP_reg[0] = *ret_opt;
     }
 }
 }

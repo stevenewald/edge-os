@@ -1,4 +1,4 @@
-#pragma once
+#include "hil/gpio_wrapper.hpp"
 
 #include "nrf_gpio.h"
 
@@ -7,34 +7,37 @@
 
 namespace edge::aidan {
 
-enum INPUT_RESISTOR { PUR, PDR, NONE };
-
-inline bool read_gpio_pin(uint32_t pin_number)
+bool read_gpio_pin(uint32_t pin_number)
 {
     return nrf_gpio_pin_read(pin_number);
 }
 
-inline void set_gpio_pin(uint32_t pin_number)
+void set_gpio_pin(uint32_t pin_number)
 {
     nrf_gpio_pin_set(pin_number);
 }
 
-inline void clear_gpio_pin(uint32_t pin_number)
+void clear_gpio_pin(uint32_t pin_number)
 {
     nrf_gpio_pin_clear(pin_number);
 }
 
-inline void toggle_gpio_pin(uint32_t pin_number)
+void write_gpio_pin(uint32_t pin_number, uint32_t value)
+{
+    nrf_gpio_pin_write(pin_number, value);
+}
+
+void toggle_gpio_pin(uint32_t pin_number)
 {
     nrf_gpio_pin_toggle(pin_number);
 }
 
-inline void set_gpio_pin_output(uint32_t pin_number)
+void set_gpio_pin_output(uint32_t pin_number)
 {
     nrf_gpio_cfg_output(pin_number);
 }
 
-inline void set_gpio_pin_input(uint32_t pin_number, INPUT_RESISTOR input_resistor)
+void set_gpio_pin_input(uint32_t pin_number, INPUT_RESISTOR input_resistor)
 {
     switch (input_resistor) {
         case INPUT_RESISTOR::NONE:

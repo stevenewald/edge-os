@@ -1,12 +1,10 @@
 #pragma once
 
-#include "nrf52833.h"
-
 #include <stdio.h>
 
 #include <cstdint>
 
-static constexpr auto MAX_PROCESSES = 5;
+static constexpr auto MAX_PROCESSES = 10;
 static constexpr size_t STACK_SIZE_BYTES = 2048;
 static constexpr size_t QUANTUM_MILLIS = 10;
 
@@ -41,10 +39,12 @@ class Scheduler {
         // ==================================
 
         unsigned* stack_ptr_loc{&stack.back()};
-        uint8_t priority;
+
+        // This is useful if we want to adjust the ratio of driver to process runtime
+        uint8_t consecutive_quantums_to_run;
 
         task(const saved_registers& metadata, uint8_t initial_priority) :
-            METADATA(metadata), priority(initial_priority)
+            METADATA(metadata), consecutive_quantums_to_run(initial_priority)
         {}
     };
 
