@@ -1,5 +1,7 @@
 #include "drivers/driver_controller.hpp"
 
+#include "drivers/button_type.hpp"
+#include "drivers/buttons.hpp"
 #include "drivers/led_display.hpp"
 #include "drivers/timer.hpp"
 
@@ -23,6 +25,8 @@ etl::optional<int> handle_command(DriverType type, int arg1, int arg2, int arg3)
         case DriverType::TERMINAL_OUTPUT:
             printf((char*)arg1);
             break;
+        case DriverType::BUTTONS:
+            return button_controller.get_button_pressed(static_cast<ButtonType>(arg1));
     }
     return etl::nullopt;
 }
