@@ -60,7 +60,6 @@ BOARD_SOURCES += \
 	nrf_strerror.c\
 	nrf_twi_mngr.c\
 	nrfx_clock.c\
-	nrfx_gpiote.c\
 	nrfx_ppi.c\
 	nrfx_prs.c\
 	nrfx_pwm.c\

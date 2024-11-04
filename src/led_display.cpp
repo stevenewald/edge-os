@@ -21,7 +21,7 @@ void LedDisplay::set_led(uint8_t row, uint8_t col, bool enabled)
     led_enabled[row][col] = enabled;
 }
 
-void LedDisplay::display_pixels_once()
+void LedDisplay::do_async_work()
 {
     for (uint8_t row = 0; row < HEIGHT; row++) {
         for (uint8_t col = 0; col < WIDTH; col++) {

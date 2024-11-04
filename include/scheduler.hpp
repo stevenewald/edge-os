@@ -1,10 +1,11 @@
 #pragma once
 
+#include "config.hpp"
+
 #include <stdio.h>
 
 #include <cstdint>
 
-static constexpr auto MAX_PROCESSES = 10;
 static constexpr size_t STACK_SIZE_BYTES = 2048;
 static constexpr size_t QUANTUM_MILLIS = 10;
 
@@ -51,6 +52,8 @@ class Scheduler {
     etl::vector<task, MAX_PROCESSES> task_stack{};
 
 public:
+    unsigned get_current_task() const { return current_task_index; }
+
     void add_task(void (*function)(void), uint8_t priority = 1);
 
     void start_scheduler();

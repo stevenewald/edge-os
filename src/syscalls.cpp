@@ -1,6 +1,5 @@
 #include "userlib/syscalls.hpp"
 
-#include "drivers/driver_commands.hpp"
 #include "register_utils.hpp"
 #include "userlib/system_call_type.hpp"
 
@@ -20,14 +19,17 @@ void change_priority(uint8_t new_priority)
     TRIGGER_SVC(SystemCallType::CHANGE_PRIORITY);
 }
 
-void yield()
+void get_button_pressed(drivers::ButtonType button_type, void* callback)
 {
-    TRIGGER_SVC(SystemCallType::YIELD);
+    SET_REGISTER(r0, (int)drivers::DriverSubscribe::NOTIFY_BUTTON_PRESS);
+    SET_REGISTER(r1, (int)callback);
+    SET_REGISTER(r2, (int)button_type);
+    TRIGGER_SVC(SystemCallType::SUBSCRIBE);
 }
 
 void set_led(uint8_t row, uint8_t col, bool enabled)
 {
-    SET_REGISTER(r0, (int)drivers::DriverType::LED_DISPLAY);
+    SET_REGISTER(r0, (int)drivers::DriverCommand::LED_DISPLAY);
     SET_REGISTER(r1, (int)row);
     SET_REGISTER(r2, (int)col);
     SET_REGISTER(r3, (int)enabled);
@@ -36,7 +38,7 @@ void set_led(uint8_t row, uint8_t col, bool enabled)
 
 bool get_button_pressed(drivers::ButtonType button_type)
 {
-    SET_REGISTER(r0, (int)drivers::DriverType::BUTTONS);
+    SET_REGISTER(r0, (int)drivers::DriverCommand::BUTTONS);
     SET_REGISTER(r1, button_type);
     TRIGGER_SVC(SystemCallType::COMMAND);
     RETURN_REGISTER(r0);
@@ -44,14 +46,14 @@ bool get_button_pressed(drivers::ButtonType button_type)
 
 int get_time_us()
 {
-    SET_REGISTER(r0, (int)drivers::DriverType::GET_TIME);
+    SET_REGISTER(r0, (int)drivers::DriverCommand::GET_TIME);
     TRIGGER_SVC(SystemCallType::COMMAND);
     RETURN_REGISTER(r0);
 }
 
 void debug_print(const char* val)
 {
-    SET_REGISTER(r0, (int)drivers::DriverType::TERMINAL_OUTPUT);
+    SET_REGISTER(r0, (int)drivers::DriverCommand::TERMINAL_OUTPUT);
     SET_REGISTER(r1, (int)val);
     TRIGGER_SVC(SystemCallType::COMMAND);
 }

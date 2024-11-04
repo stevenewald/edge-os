@@ -37,16 +37,16 @@ void set_gpio_pin_output(uint32_t pin_number)
     nrf_gpio_cfg_output(pin_number);
 }
 
-void set_gpio_pin_input(uint32_t pin_number, INPUT_RESISTOR input_resistor)
+void set_gpio_pin_input(uint32_t pin_number, InputResistor input_resistor)
 {
     switch (input_resistor) {
-        case INPUT_RESISTOR::NONE:
+        case InputResistor::NONE:
             nrf_gpio_cfg_input(pin_number, NRF_GPIO_PIN_NOPULL);
             break;
-        case INPUT_RESISTOR::PUR:
+        case InputResistor::PUR:
             nrf_gpio_cfg_input(pin_number, NRF_GPIO_PIN_PULLUP);
             break;
-        case INPUT_RESISTOR::PDR:
+        case InputResistor::PDR:
             nrf_gpio_cfg_input(pin_number, NRF_GPIO_PIN_PULLDOWN);
             break;
     }

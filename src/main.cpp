@@ -1,3 +1,4 @@
+#include "drivers/led_display.hpp"
 #include "nrf_delay.h"
 #include "scheduler.hpp"
 #include "userlib/syscalls.hpp"
@@ -13,23 +14,29 @@ static constexpr auto TASK1_PRIO = 50;
 template <int N>
 void task(void)
 {
-    using edge::userlib::change_priority;
-    using edge::userlib::get_button_pressed;
-    using edge::userlib::get_time_us;
-    using edge::userlib::set_led;
+    using namespace edge::userlib;
+    using namespace edge::drivers;
     change_priority(1);
-    int j = N;
+
+    static bool flipped = false;
+    static void (*on_button_press)();
+    on_button_press = []() {
+        flipped = !flipped;
+        get_button_pressed(ButtonType::A, (void*)(+on_button_press));
+    };
+
+    get_button_pressed(ButtonType::A, (void*)+on_button_press);
+
     while (1) {
-        j++;
-        if (get_button_pressed(edge::drivers::ButtonType::A)) {
-            set_led(4 - N, 4 - (j % 5), true);
-            nrf_delay_ms(15);
-            set_led(4 - N, 4 - (j % 5), false);
+        if (flipped) {
+            set_led(N, 0, true);
+            yield();
+            set_led(N, 0, false);
         }
         else {
-            set_led(N, j % 5, true);
-            nrf_delay_ms(15);
-            set_led(N, j % 5, false);
+            set_led(0, N, true);
+            yield();
+            set_led(0, N, false);
         }
     }
 }

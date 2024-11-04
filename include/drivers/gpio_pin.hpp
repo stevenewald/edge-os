@@ -1,12 +1,12 @@
 #pragma once
 
+#include "driver_enums.hpp"
 #include "hil/gpio_wrapper.hpp"
+#include "hil/hil_enums.hpp"
 #include "stdint.h"
 
 namespace edge {
 namespace drivers {
-
-enum GPIOConfiguration { OUT, IN_NORES, IN_PDR, IN_PUR };
 
 class GPIOPin {
 public:
@@ -18,13 +18,13 @@ public:
                 aidan::set_gpio_pin_output(pin_number);
                 break;
             case GPIOConfiguration::IN_NORES:
-                aidan::set_gpio_pin_input(pin_number, aidan::INPUT_RESISTOR::NONE);
+                aidan::set_gpio_pin_input(pin_number, aidan::InputResistor::NONE);
                 break;
             case GPIOConfiguration::IN_PDR:
-                aidan::set_gpio_pin_input(pin_number, aidan::INPUT_RESISTOR::PDR);
+                aidan::set_gpio_pin_input(pin_number, aidan::InputResistor::PDR);
                 break;
             case GPIOConfiguration::IN_PUR:
-                aidan::set_gpio_pin_input(pin_number, aidan::INPUT_RESISTOR::PUR);
+                aidan::set_gpio_pin_input(pin_number, aidan::InputResistor::PUR);
                 break;
         }
     }

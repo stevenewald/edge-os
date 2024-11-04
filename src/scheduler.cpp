@@ -1,7 +1,9 @@
 #include "scheduler.hpp"
 
 #include "drivers/driver_controller.hpp"
+#include "drivers/led_display.hpp"
 #include "nrf52833.h"
+#include "register_utils.hpp"
 
 namespace edge {
 
@@ -101,9 +103,17 @@ __attribute__((used)) void SysTick_Handler()
 
 void Scheduler::yield_current_task()
 {
-    printf("Task %d yielded\n", current_task_index);
-    slices_remaining = 1;
-    trigger_pendsv();
+    auto callback_opt = drivers::get_ready_callback(current_task_index);
+    if (callback_opt) {
+        auto addr = (uint32_t)callback_opt.value();
+        auto& t = scheduler.task_stack[scheduler.current_task_index];
+        *(t.stack_ptr_loc + 5) = *(t.stack_ptr_loc + 6) + 1;
+        *(t.stack_ptr_loc + 6) = addr;
+    }
+    else {
+        slices_remaining = 1;
+        trigger_pendsv();
+    }
 }
 
 } // namespace edge
