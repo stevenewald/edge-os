@@ -1,9 +1,7 @@
 #include "scheduler.hpp"
 
 #include "drivers/driver_controller.hpp"
-#include "drivers/led_display.hpp"
 #include "nrf52833.h"
-#include "register_utils.hpp"
 
 namespace edge {
 
@@ -20,6 +18,8 @@ void Scheduler::start_scheduler()
         SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
 
     NVIC_SetPriority(PendSV_IRQn, 0x3);
+    // TODO: move to bootloader?
+    NVIC_SetPriority(GPIOTE_IRQn, 0x2);
     NVIC_SetPriority(SysTick_IRQn, 0x1);
     asm volatile("CPSIE I");
     asm volatile("SVC #0");
@@ -58,7 +58,7 @@ __attribute__((naked, used)) void PendSV_Handler()
     asm volatile("CPSID I");
     if (--scheduler.slices_remaining == 0) {
         asm volatile("mrs r0,psp\n"
-                     "sub r0,#96\n"
+                     "sub r0,#32\n"
                      "stm r0!,{r4-r11}");
 
         // This function will dirty registers. That's okay
@@ -78,7 +78,7 @@ __attribute__((naked, used)) void PendSV_Handler()
         ));
 
         asm volatile("mrs r0,psp\n"
-                     "sub r0,#96\n"
+                     "sub r0,#32\n"
                      "ldm r0!,{r4-r11}\n");
     }
 
@@ -101,14 +101,41 @@ __attribute__((used)) void SysTick_Handler()
 }
 }
 
+__attribute__((used, naked)) void restore()
+{
+    asm volatile("mrs r0, psp\n"
+                 "add r0, #32\n"
+                 "msr psp, r0\n");
+    asm volatile("ldr     r0, [sp, #0]\n"
+                 "ldr     r1, [sp, #4]\n"
+                 "ldr     r2, [sp, #8]\n"
+                 "ldr     r3, [sp, #12]\n"
+                 "ldr     r12, [sp, #16]\n"
+                 "ldr     lr, [sp, #20]\n"
+                 "ldr     pc, [sp, #24]\n");
+}
+
 void Scheduler::yield_current_task()
 {
     auto callback_opt = drivers::get_ready_callback(current_task_index);
     if (callback_opt) {
-        auto addr = (uint32_t)callback_opt.value();
+        printf("Yield1\n");
+        auto [address, arg1] = callback_opt.value();
         auto& t = scheduler.task_stack[scheduler.current_task_index];
-        *(t.stack_ptr_loc + 5) = *(t.stack_ptr_loc + 6) + 1;
-        *(t.stack_ptr_loc + 6) = addr;
+        t.stack_ptr_loc = (unsigned*)__get_PSP();
+        (*(t.stack_ptr_loc + 6))++;
+
+        // "Push" registers
+        t.stack_ptr_loc -= 8;
+        *(t.stack_ptr_loc + 0) = *(t.stack_ptr_loc + 8 + 0);
+        *(t.stack_ptr_loc + 1) = *(t.stack_ptr_loc + 8 + 1);
+        *(t.stack_ptr_loc + 2) = *(t.stack_ptr_loc + 8 + 2);
+        *(t.stack_ptr_loc + 3) = *(t.stack_ptr_loc + 8 + 3);
+        *(t.stack_ptr_loc + 4) = *(t.stack_ptr_loc + 8 + 4);
+        *(t.stack_ptr_loc + 5) = (unsigned)&restore;
+        *(t.stack_ptr_loc + 6) = (unsigned)address;
+        *(t.stack_ptr_loc + 7) = *(t.stack_ptr_loc + 8 + 7);
+        __set_PSP((unsigned)t.stack_ptr_loc);
     }
     else {
         slices_remaining = 1;

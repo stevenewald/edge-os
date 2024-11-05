@@ -1,5 +1,6 @@
 #include "userlib/syscalls.hpp"
 
+#include "drivers/driver_enums.hpp"
 #include "register_utils.hpp"
 #include "userlib/system_call_type.hpp"
 
@@ -19,7 +20,14 @@ void change_priority(uint8_t new_priority)
     TRIGGER_SVC(SystemCallType::CHANGE_PRIORITY);
 }
 
-void get_button_pressed(drivers::ButtonType button_type, void* callback)
+void yield()
+{
+    TRIGGER_SVC(SystemCallType::YIELD);
+}
+
+void get_button_pressed(
+    drivers::ButtonType button_type, void (*callback)(drivers::ButtonType)
+)
 {
     SET_REGISTER(r0, (int)drivers::DriverSubscribe::NOTIFY_BUTTON_PRESS);
     SET_REGISTER(r1, (int)callback);

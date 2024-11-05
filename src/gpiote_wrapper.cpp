@@ -8,9 +8,9 @@ namespace edge::aidan {
 
 constexpr uint32_t MAX_GPIOTE_CHANNELS = 8;
 
-etl::array<void (*)(), MAX_GPIOTE_CHANNELS> gpiote_callbacks{nullptr};
+etl::array<void (*)(int), MAX_GPIOTE_CHANNELS> gpiote_callbacks{nullptr};
 
-void set_gpiote_callback(uint32_t channel, void (*callback)())
+void set_gpiote_callback(uint32_t channel, void (*callback)(int))
 {
     gpiote_callbacks[channel] = callback;
     nrf_gpiote_int_enable(NRF_GPIOTE_INT_IN0_MASK << channel);
@@ -50,7 +50,7 @@ void GPIOTE_IRQHandler()
             nrf_gpiote_event_clear(GPIOTE_EVENTS[channel]);
 
             if (gpiote_callbacks[channel] != nullptr) {
-                gpiote_callbacks[channel]();
+                gpiote_callbacks[channel](channel);
             }
         }
     }

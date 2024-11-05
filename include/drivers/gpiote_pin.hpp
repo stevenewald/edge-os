@@ -8,9 +8,10 @@ class GPIOTEPin {
     uint32_t channel;
 
 public:
+    // TODO: use PORT event instead so we aren't limited to 8 of these
     GPIOTEPin(
         uint32_t channel, uint32_t pin_number, aidan::GPIOTEEventPolarity polarity,
-        void (*callback)()
+        void (*callback)(int)
     ) : channel(channel)
     {
         aidan::configure_gpiote_event(channel, pin_number, polarity);

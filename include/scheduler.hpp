@@ -7,12 +7,13 @@
 #include <cstdint>
 
 static constexpr size_t STACK_SIZE_BYTES = 2048;
-static constexpr size_t QUANTUM_MILLIS = 10;
+static constexpr size_t QUANTUM_MILLIS = 5;
 
 namespace edge {
 extern "C" {
 void PendSV_Handler();
 void SVC_Handler();
+void restore();
 }
 
 class Scheduler {
@@ -66,6 +67,7 @@ private:
 
     friend void PendSV_Handler(void);
     friend void SVC_Handler(void);
+    friend void restore(void);
 };
 
 extern Scheduler scheduler;

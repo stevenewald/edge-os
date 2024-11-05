@@ -3,8 +3,8 @@
 namespace edge::drivers {
 ButtonController button_controller;
 
-void handle_callback()
+void handle_callback(int channel)
 {
-    button_controller.handle_callback();
+    button_controller.handle_callback(channel);
 }
 } // namespace edge::drivers

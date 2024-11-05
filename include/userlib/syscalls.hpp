@@ -1,8 +1,6 @@
 #pragma once
 
 #include "drivers/driver_enums.hpp"
-#include "register_utils.hpp"
-#include "userlib/system_call_type.hpp"
 
 namespace edge::userlib {
 
@@ -16,10 +14,7 @@ void change_priority(uint8_t new_priority);
  *
  * In other words, this must be inlined
  */
-__attribute__((always_inline)) inline void yield()
-{
-    TRIGGER_SVC(SystemCallType::YIELD);
-}
+void yield();
 
 void set_led(uint8_t row, uint8_t col, bool enabled);
 
@@ -27,7 +22,9 @@ int get_time_us();
 
 bool get_button_pressed(drivers::ButtonType button_type);
 
-void get_button_pressed(drivers::ButtonType button_type, void* callback);
+void get_button_pressed(
+    drivers::ButtonType button_type, void (*callback)(drivers::ButtonType)
+);
 
 // We need a syscall for this because SVC will not be preempted by SysTick
 // Technically this is insecure - it's mostly for debugging

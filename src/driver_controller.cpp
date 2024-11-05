@@ -32,7 +32,8 @@ etl::optional<int> handle_command(DriverCommand type, int arg1, int arg2, int ar
 }
 
 void handle_subscribe(
-    DriverSubscribe type, void* callback, int arg1, int arg2, uint8_t process_id
+    DriverSubscribe type, ButtonCallbackPtr callback, int arg1, int arg2,
+    uint8_t process_id
 )
 {
     switch (type) {
@@ -44,10 +45,7 @@ void handle_subscribe(
     }
 }
 
-// For now, no arguments in callbacks. Essentially just a trigger
-// I don't like this interface, but the overall arch is ok for now
-// We can discuss how to make this more generic
-etl::optional<void*> get_ready_callback(uint8_t process_id)
+etl::optional<button_subscribe_callback> get_ready_callback(uint8_t process_id)
 {
     return button_controller.get_ready_callback(process_id);
 }

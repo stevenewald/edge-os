@@ -6,7 +6,7 @@
 
 namespace edge::aidan {
 
-void set_gpiote_callback(uint32_t channel, void (*callback)());
+void set_gpiote_callback(uint32_t channel, void (*callback)(int));
 
 void clear_gpiote_event(uint32_t channel);
 

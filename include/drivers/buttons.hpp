@@ -7,7 +7,7 @@
 #include "microbit_v2.h"
 
 namespace edge::drivers {
-void handle_callback();
+void handle_callback(int channel);
 
 class ButtonController {
     GPIOPin button_a{BTN_A, GPIOConfiguration::IN_PUR};
@@ -16,16 +16,24 @@ class ButtonController {
     GPIOTEPin int_button_a{
         0, BTN_A, aidan::GPIOTEEventPolarity::HI_TO_LO, &edge::drivers::handle_callback
     };
+    GPIOTEPin int_button_b{
+        1, BTN_B, aidan::GPIOTEEventPolarity::HI_TO_LO, &edge::drivers::handle_callback
+    };
 
-    etl::array<void*, MAX_PROCESSES> callbacks{nullptr};
-    etl::array<bool, MAX_PROCESSES> callback_ready{false};
+    using SubscriptionArray = etl::array<ButtonCallbackPtr, MAX_PROCESSES>;
+    etl::array<SubscriptionArray, 2> subscriptions;
+    etl::array<etl::vector<button_subscribe_callback, 10>, MAX_PROCESSES>
+        ready_callbacks;
 
 public:
-    void handle_callback()
+    void handle_callback(int button_type)
     {
+        auto& button_subscriptions = subscriptions[button_type];
         for (int i = 0; i < MAX_PROCESSES; i++) {
-            if (callbacks[i] != nullptr) {
-                callback_ready[i] = true;
+            if (button_subscriptions[i]) {
+                ready_callbacks[i].emplace_back(
+                    button_subscriptions[i], static_cast<ButtonType>(button_type)
+                );
             }
         }
     }
@@ -40,19 +48,21 @@ public:
         }
     }
 
-    void subscribe_button_press(ButtonType type, void* callback, uint8_t process_id)
+    void subscribe_button_press(
+        ButtonType type, ButtonCallbackPtr callback, uint8_t process_id
+    )
     {
-        callbacks[process_id] = callback;
+        subscriptions[static_cast<unsigned>(type)][process_id] = callback;
     }
 
-    etl::optional<void*> get_ready_callback(uint8_t process_id)
+    etl::optional<button_subscribe_callback> get_ready_callback(uint8_t process_id)
     {
-        if (callbacks[process_id] == nullptr || !callback_ready[process_id])
+        if (ready_callbacks[process_id].empty()) {
             return etl::nullopt;
-        etl::optional<void*> opt = callbacks[process_id];
-        callbacks[process_id] = nullptr;
-        callback_ready[process_id] = false;
-        return opt;
+        }
+        button_subscribe_callback ret = ready_callbacks[process_id].back();
+        ready_callbacks[process_id].pop_back();
+        return ret;
     }
 };
 
