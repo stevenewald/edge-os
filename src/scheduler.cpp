@@ -68,8 +68,8 @@ __attribute__((naked, used)) void PendSV_Handler()
                 ? 0
                 : scheduler.current_task_index + 1;
 
-        scheduler.slices_remaining =
-            scheduler.task_stack[scheduler.current_task_index].consecutive_quantums_to_run;
+        scheduler.slices_remaining = scheduler.task_stack[scheduler.current_task_index]
+                                         .consecutive_quantums_to_run;
 
         __set_PSP(reinterpret_cast<unsigned>(
             scheduler.task_stack[scheduler.current_task_index].stack_ptr_loc

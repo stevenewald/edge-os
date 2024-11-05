@@ -13,32 +13,24 @@ static constexpr auto TASK1_PRIO = 50;
 template <int N>
 void task(void)
 {
-	using edge::userlib::change_priority;
-	using edge::userlib::set_led;
-	using edge::userlib::get_time_us;
+    using edge::userlib::change_priority;
+    using edge::userlib::get_button_pressed;
+    using edge::userlib::get_time_us;
+    using edge::userlib::set_led;
     change_priority(1);
-    int j = 0;
+    int j = N;
     while (1) {
-        set_led(4 - (N + j) % 5, 4 - N, false);
-        set_led((N + j) % 5, N, false);
         j++;
-        if (get_time_us()/2'000'000 & 1) {
-            set_led((N + j) % 5, N, true);
+        if (get_button_pressed(edge::drivers::ButtonType::A)) {
+            set_led(4 - N, 4 - (j % 5), true);
+            nrf_delay_ms(15);
+            set_led(4 - N, 4 - (j % 5), false);
         }
         else {
-            set_led(4 - (N + j) % 5, 4 - N, true);
+            set_led(N, j % 5, true);
+            nrf_delay_ms(15);
+            set_led(N, j % 5, false);
         }
-        nrf_delay_ms(15);
-    }
-}
-
-[[maybe_unused]] void print_time(void)
-{
-    while (1) {
-        etl::string<50> str;
-        etl::to_string(edge::userlib::get_time_us(), str);
-        edge::userlib::debug_println(str);
-        edge::userlib::yield();
     }
 }
 
