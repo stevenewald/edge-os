@@ -18,20 +18,16 @@ void task(void)
     change_priority(1);
 
     static bool flipped = false;
-    static etl::string<20> a = "button a";
-    static etl::string<20> b = "button b";
     static void (*on_button_press)(ButtonType) = [](ButtonType button_type) {
-        // if (button_type == ButtonType::A) {
-        //     debug_println(a);
-        // }
-        // else {
-        //     debug_println(b);
-        // }
         flipped = !flipped;
     };
 
-    get_button_pressed(ButtonType::A, on_button_press);
-    get_button_pressed(ButtonType::B, on_button_press);
+    if constexpr (N % 2 == 0) {
+        get_button_pressed(ButtonType::A, on_button_press);
+    }
+    else {
+        get_button_pressed(ButtonType::B, on_button_press);
+    }
 
     while (1) {
         if (flipped) {
