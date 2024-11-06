@@ -13,12 +13,14 @@ enum class DriverSubscribe { NOTIFY_BUTTON_PRESS = 0 };
 enum class GPIOConfiguration { OUT, IN_NORES, IN_PDR, IN_PUR };
 
 enum class ButtonType { A = 0, B = 1 };
+enum class ButtonState { UP = 0, DOWN = 1 };
 
-using ButtonCallbackPtr = void (*)(ButtonType);
+using SubscribeCallbackPtr = void (*)(int, int);
 
-struct button_subscribe_callback {
-    ButtonCallbackPtr callback;
-    ButtonType type;
+struct subscribe_callback {
+    SubscribeCallbackPtr callback;
+    int arg1;
+    int arg2;
 };
 
 } // namespace edge::drivers

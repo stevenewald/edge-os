@@ -1,6 +1,6 @@
 #pragma once
 
-#include "hil/hil_enums.hpp"
+#include "hal/hal_enums.hpp"
 
 namespace edge::aidan {
 

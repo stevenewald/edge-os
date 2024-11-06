@@ -1,5 +1,6 @@
-#include "hil/gpio_wrapper.hpp"
+#include "hal/gpio_wrapper.hpp"
 
+#include "hal/hal_enums.hpp"
 #include "nrf_gpio.h"
 
 #include <stdbool.h>
@@ -39,17 +40,7 @@ void set_gpio_pin_output(uint32_t pin_number)
 
 void set_gpio_pin_input(uint32_t pin_number, InputResistor input_resistor)
 {
-    switch (input_resistor) {
-        case InputResistor::NONE:
-            nrf_gpio_cfg_input(pin_number, NRF_GPIO_PIN_NOPULL);
-            break;
-        case InputResistor::PUR:
-            nrf_gpio_cfg_input(pin_number, NRF_GPIO_PIN_PULLUP);
-            break;
-        case InputResistor::PDR:
-            nrf_gpio_cfg_input(pin_number, NRF_GPIO_PIN_PULLDOWN);
-            break;
-    }
+    nrf_gpio_cfg_input(pin_number, static_cast<nrf_gpio_pin_pull_t>(input_resistor));
 }
 
 } // namespace edge::aidan

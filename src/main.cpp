@@ -7,9 +7,6 @@
 
 // Pin configurations
 
-static constexpr auto TASK0_PRIO = 1;
-static constexpr auto TASK1_PRIO = 50;
-
 template <int N>
 void task(void)
 {
@@ -18,16 +15,18 @@ void task(void)
     change_priority(1);
 
     static bool flipped = false;
-    static void (*on_button_press)(ButtonType) = [](ButtonType button_type) {
-        flipped = !flipped;
+    static void (*on_button_press)(ButtonType, ButtonState) = [](ButtonType type,
+                                                                 ButtonState state) {
+        if (state == ButtonState::DOWN) {
+            if (type == ButtonType::A)
+                flipped = true;
+            else
+                flipped = false;
+        }
     };
 
-    if constexpr (N % 2 == 0) {
-        get_button_pressed(ButtonType::A, on_button_press);
-    }
-    else {
-        get_button_pressed(ButtonType::B, on_button_press);
-    }
+    get_button_pressed(ButtonType::A, on_button_press);
+    get_button_pressed(ButtonType::B, on_button_press);
 
     while (1) {
         if (flipped) {

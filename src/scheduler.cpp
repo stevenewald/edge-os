@@ -18,8 +18,6 @@ void Scheduler::start_scheduler()
         SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
 
     NVIC_SetPriority(PendSV_IRQn, 0x3);
-    // TODO: move to bootloader?
-    NVIC_SetPriority(GPIOTE_IRQn, 0x2);
     NVIC_SetPriority(SysTick_IRQn, 0x1);
     asm volatile("CPSIE I");
     asm volatile("SVC #0");
@@ -132,7 +130,7 @@ void Scheduler::yield_current_task()
         trigger_pendsv();
         return;
     }
-    auto [callback_address, arg1] = callback_opt.value();
+    auto [callback_address, arg1, arg2] = callback_opt.value();
     auto& t = scheduler.task_stack[scheduler.current_task_index];
 
     // This stack frame, originally created by the exception handler, will be popped
@@ -148,6 +146,7 @@ void Scheduler::yield_current_task()
     t.stack_ptr_loc -= 7;
     auto new_registers = reinterpret_cast<saved_registers*>(t.stack_ptr_loc);
     new_registers->R0 = static_cast<unsigned>(arg1);
+    new_registers->R1 = static_cast<unsigned>(arg2);
     new_registers->LR = reinterpret_cast<unsigned>(&restore_regs);
     new_registers->RETURN_ADDR = reinterpret_cast<unsigned>(callback_address);
     new_registers->FLAG = old_flag;

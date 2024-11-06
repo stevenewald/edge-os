@@ -26,7 +26,8 @@ void yield()
 }
 
 void get_button_pressed(
-    drivers::ButtonType button_type, void (*callback)(drivers::ButtonType)
+    drivers::ButtonType button_type,
+    void (*callback)(drivers::ButtonType, drivers::ButtonState)
 )
 {
     SET_REGISTER(r0, (int)drivers::DriverSubscribe::NOTIFY_BUTTON_PRESS);

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "driver_enums.hpp"
-#include "hil/gpio_wrapper.hpp"
-#include "hil/hil_enums.hpp"
+#include "hal/gpio_wrapper.hpp"
+#include "hal/hal_enums.hpp"
 #include "stdint.h"
 
 namespace edge {
