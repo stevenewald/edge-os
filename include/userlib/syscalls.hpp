@@ -1,11 +1,19 @@
 #pragma once
 
-#include "drivers/button_type.hpp"
+#include "drivers/driver_enums.hpp"
 
 namespace edge::userlib {
 
 void change_priority(uint8_t new_priority);
 
+/**
+ * We call callbacks by modifying lr and psp
+ * Consider what happens if we *don't* inline this function
+ * After the SVC call, it will restore the stack frame and b lr
+ * We don't want this, because we want to directly jump to the callback
+ *
+ * In other words, this must be inlined
+ */
 void yield();
 
 void set_led(uint8_t row, uint8_t col, bool enabled);
@@ -13,6 +21,10 @@ void set_led(uint8_t row, uint8_t col, bool enabled);
 int get_time_us();
 
 bool get_button_pressed(drivers::ButtonType button_type);
+
+void get_button_pressed(
+    drivers::ButtonType button_type, void (*callback)(drivers::ButtonType)
+);
 
 // We need a syscall for this because SVC will not be preempted by SysTick
 // Technically this is insecure - it's mostly for debugging

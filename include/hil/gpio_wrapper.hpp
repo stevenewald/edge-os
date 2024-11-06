@@ -1,8 +1,8 @@
 #pragma once
 
-namespace edge::aidan {
+#include "hil/hil_enums.hpp"
 
-enum INPUT_RESISTOR { PUR, PDR, NONE };
+namespace edge::aidan {
 
 bool read_gpio_pin(uint32_t pin_number);
 
@@ -16,6 +16,6 @@ void toggle_gpio_pin(uint32_t pin_number);
 
 void set_gpio_pin_output(uint32_t pin_number);
 
-void set_gpio_pin_input(uint32_t pin_number, INPUT_RESISTOR input_resistor);
+void set_gpio_pin_input(uint32_t pin_number, InputResistor input_resistor);
 
 } // namespace edge::aidan
