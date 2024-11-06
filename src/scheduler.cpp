@@ -87,11 +87,12 @@ __attribute__((naked, used)) void PendSV_Handler()
                      "ldm r0!,{r4-r11}\n");
     }
 
+    asm volatile("CPSIE I");
+
     // Always want to call drivers on context switch
     drivers::do_async_work();
 
-    asm volatile("CPSIE I\n"
-                 "ldr r0,=0xfffffffd\n"
+    asm volatile("ldr r0,=0xfffffffd\n"
                  "bx r0");
 }
 
