@@ -101,41 +101,42 @@ __attribute__((used)) void SysTick_Handler()
 }
 }
 
-__attribute__((used, naked)) void restore()
+__attribute__((used, naked)) void restore_regs()
 {
-    asm volatile("mrs r0, psp\n"
-                 "add r0, #32\n"
-                 "msr psp, r0\n");
-    asm volatile("ldr     r0, [sp, #0]\n"
-                 "ldr     r1, [sp, #4]\n"
-                 "ldr     r2, [sp, #8]\n"
-                 "ldr     r3, [sp, #12]\n"
-                 "ldr     r12, [sp, #16]\n"
-                 "ldr     lr, [sp, #20]\n"
-                 "ldr     pc, [sp, #24]\n");
+    asm volatile("pop {r0, r1, r2, r3, r12, lr}\npop {pc}");
 }
 
 void Scheduler::yield_current_task()
 {
     auto callback_opt = drivers::get_ready_callback(current_task_index);
     if (callback_opt) {
-        printf("Yield1\n");
-        auto [address, arg1] = callback_opt.value();
+        auto [callback_address, arg1] = callback_opt.value();
         auto& t = scheduler.task_stack[scheduler.current_task_index];
-        t.stack_ptr_loc = (unsigned*)__get_PSP();
+
+        // This stack frame, originally created by the exception handler, will be popped
+        // by restore()
+        t.stack_ptr_loc = reinterpret_cast<unsigned*>(__get_PSP());
         (*(t.stack_ptr_loc + 6))++;
 
-        // "Push" registers
-        t.stack_ptr_loc -= 8;
-        *(t.stack_ptr_loc + 0) = *(t.stack_ptr_loc + 8 + 0);
-        *(t.stack_ptr_loc + 1) = *(t.stack_ptr_loc + 8 + 1);
-        *(t.stack_ptr_loc + 2) = *(t.stack_ptr_loc + 8 + 2);
-        *(t.stack_ptr_loc + 3) = *(t.stack_ptr_loc + 8 + 3);
-        *(t.stack_ptr_loc + 4) = *(t.stack_ptr_loc + 8 + 4);
-        *(t.stack_ptr_loc + 5) = (unsigned)&restore;
-        *(t.stack_ptr_loc + 6) = (unsigned)address;
-        *(t.stack_ptr_loc + 7) = *(t.stack_ptr_loc + 8 + 7);
-        __set_PSP((unsigned)t.stack_ptr_loc);
+        // kill me
+        auto tmp = *(t.stack_ptr_loc + 7);
+        *(t.stack_ptr_loc + 7) = *(t.stack_ptr_loc + 6);
+        *(t.stack_ptr_loc + 6) = *(t.stack_ptr_loc + 5);
+        *(t.stack_ptr_loc + 5) = *(t.stack_ptr_loc + 4);
+        *(t.stack_ptr_loc + 4) = *(t.stack_ptr_loc + 3);
+        *(t.stack_ptr_loc + 3) = *(t.stack_ptr_loc + 2);
+        *(t.stack_ptr_loc + 2) = *(t.stack_ptr_loc + 1);
+        *(t.stack_ptr_loc + 1) = *(t.stack_ptr_loc + 0);
+        *(t.stack_ptr_loc) = 0;
+
+        // "Push" registers, create a fake stack frame
+        // This will be popped by the exception handler
+        t.stack_ptr_loc -= 7;
+        (*(t.stack_ptr_loc)) = static_cast<unsigned>(arg1);
+        *(t.stack_ptr_loc + 5) = reinterpret_cast<unsigned>(&restore_regs);
+        *(t.stack_ptr_loc + 6) = reinterpret_cast<unsigned>(callback_address);
+        *(t.stack_ptr_loc + 7) = tmp;
+        __set_PSP(reinterpret_cast<unsigned>(t.stack_ptr_loc));
     }
     else {
         slices_remaining = 1;

@@ -28,12 +28,13 @@ class ButtonController {
 public:
     void handle_callback(int button_type)
     {
-        auto& button_subscriptions = subscriptions[button_type];
+        SubscriptionArray& button_subscriptions = subscriptions[button_type];
         for (int i = 0; i < MAX_PROCESSES; i++) {
-            if (button_subscriptions[i]) {
+            if (button_subscriptions[i]!=nullptr) {
                 ready_callbacks[i].emplace_back(
                     button_subscriptions[i], static_cast<ButtonType>(button_type)
                 );
+				ASSERT(ready_callbacks[i].size()<10);
             }
         }
     }

@@ -1,4 +1,4 @@
-#include "nrf_delay.h"
+#include "drivers/driver_enums.hpp"
 #include "scheduler.hpp"
 #include "userlib/syscalls.hpp"
 
@@ -18,19 +18,20 @@ void task(void)
     change_priority(1);
 
     static bool flipped = false;
-    static int num = 0;
+    static etl::string<20> a = "button a";
+    static etl::string<20> b = "button b";
     static void (*on_button_press)(ButtonType) = [](ButtonType button_type) {
-		// volatile int num = 0;
-        // num++;
-        // etl::string<20> v;
-        // etl::to_string(num, v);
-        // debug_println(v);
+        // if (button_type == ButtonType::A) {
+        //     debug_println(a);
+        // }
+        // else {
+        //     debug_println(b);
+        // }
         flipped = !flipped;
-        nrf_delay_ms(1000);
     };
 
     get_button_pressed(ButtonType::A, on_button_press);
-    // get_button_pressed(ButtonType::B, on_button_press);
+    get_button_pressed(ButtonType::B, on_button_press);
 
     while (1) {
         if (flipped) {
@@ -50,11 +51,11 @@ int main(void)
 {
     printf("Starting EdgeOS\n");
 
-    // edge::scheduler.add_task(task<0>);
-    // edge::scheduler.add_task(task<1>);
-    // edge::scheduler.add_task(task<2>);
-    // edge::scheduler.add_task(task<3>);
     edge::scheduler.add_task(task<4>);
+    edge::scheduler.add_task(task<3>);
+    edge::scheduler.add_task(task<2>);
+    edge::scheduler.add_task(task<1>);
+    edge::scheduler.add_task(task<0>);
 
     edge::scheduler.start_scheduler();
 }
