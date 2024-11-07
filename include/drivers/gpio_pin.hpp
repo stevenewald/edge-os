@@ -1,8 +1,8 @@
 #pragma once
 
 #include "driver_enums.hpp"
-#include "hil/gpio_wrapper.hpp"
-#include "hil/hil_enums.hpp"
+#include "hal/gpio_wrapper.hpp"
+#include "hal/hal_enums.hpp"
 #include "stdint.h"
 
 namespace edge {
@@ -18,13 +18,13 @@ public:
                 aidan::set_gpio_pin_output(pin_number);
                 break;
             case GPIOConfiguration::IN_NORES:
-                aidan::set_gpio_pin_input(pin_number, aidan::InputResistor::NONE);
+                aidan::set_gpio_pin_input(pin_number, aidan::PinPullMode::NONE);
                 break;
             case GPIOConfiguration::IN_PDR:
-                aidan::set_gpio_pin_input(pin_number, aidan::InputResistor::PDR);
+                aidan::set_gpio_pin_input(pin_number, aidan::PinPullMode::PDR);
                 break;
             case GPIOConfiguration::IN_PUR:
-                aidan::set_gpio_pin_input(pin_number, aidan::InputResistor::PUR);
+                aidan::set_gpio_pin_input(pin_number, aidan::PinPullMode::PUR);
                 break;
         }
     }

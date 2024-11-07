@@ -26,7 +26,7 @@ etl::optional<int> handle_driver_command(uint32_t* stack_ptr)
 void handle_driver_subscribe(uint32_t* stack_ptr)
 {
     auto type = static_cast<drivers::DriverSubscribe>(stack_ptr[0]);
-    auto callback = reinterpret_cast<drivers::ButtonCallbackPtr>(stack_ptr[1]);
+    auto callback = reinterpret_cast<drivers::SubscribeCallbackPtr>(stack_ptr[1]);
     int arg1 = stack_ptr[2];
     int arg2 = stack_ptr[3];
     return drivers::handle_subscribe(

@@ -23,7 +23,8 @@ int get_time_us();
 bool get_button_pressed(drivers::ButtonType button_type);
 
 void get_button_pressed(
-    drivers::ButtonType button_type, void (*callback)(drivers::ButtonType)
+    drivers::ButtonType button_type,
+    void (*callback)(drivers::ButtonType, drivers::ButtonState)
 );
 
 // We need a syscall for this because SVC will not be preempted by SysTick

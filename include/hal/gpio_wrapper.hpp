@@ -1,6 +1,6 @@
 #pragma once
 
-#include "hil/hil_enums.hpp"
+#include "hal/hal_enums.hpp"
 
 namespace edge::aidan {
 
@@ -16,6 +16,6 @@ void toggle_gpio_pin(uint32_t pin_number);
 
 void set_gpio_pin_output(uint32_t pin_number);
 
-void set_gpio_pin_input(uint32_t pin_number, InputResistor input_resistor);
+void set_gpio_pin_input(uint32_t pin_number, PinPullMode input_resistor);
 
 } // namespace edge::aidan
