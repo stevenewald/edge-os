@@ -41,14 +41,8 @@ GPIOEventController::~GPIOEventController()
     nrf_gpiote_int_disable(NRF_GPIOTE_INT_PORT_MASK);
 }
 
-extern "C" {
-void GPIOTE_IRQHandler()
+void GPIOEventController::handle_gpiote_port_event() const
 {
-    if (!nrf_gpiote_event_is_set(NRF_GPIOTE_EVENTS_PORT)) {
-        return;
-    }
-    nrf_gpiote_event_clear(NRF_GPIOTE_EVENTS_PORT);
-
     auto latch = NRF_GPIO->LATCH;
 
     for (uint32_t pin = 0; pin < GPIO_PINS; pin++) {
@@ -69,6 +63,15 @@ void GPIOTE_IRQHandler()
         }
     }
     NRF_GPIO->LATCH = latch;
+}
+
+extern "C" {
+void GPIOTE_IRQHandler()
+{
+    if (nrf_gpiote_event_is_set(NRF_GPIOTE_EVENTS_PORT)) {
+		GPIOEventController::get().handle_gpiote_port_event();
+        nrf_gpiote_event_clear(NRF_GPIOTE_EVENTS_PORT);
+    }
 }
 }
 

@@ -9,7 +9,6 @@ extern "C" void GPIOTE_IRQHandler();
 static constexpr uint8_t GPIO_PINS = 32;
 
 // TODO: Add a controller for other GPIOTE events (channels)?
-// Avoiding premature optimization, lockign it to just pin events for now
 class GPIOEventController {
 public:
     using GPIOEventCallback = void (*)(nrf_gpio_pin_sense_t sense, int pin);
@@ -17,6 +16,7 @@ public:
 private:
     etl::array<GPIOEventCallback, GPIO_PINS> callbacks{nullptr};
 
+    void handle_gpiote_port_event() const;
     GPIOEventController();
 
 public:
