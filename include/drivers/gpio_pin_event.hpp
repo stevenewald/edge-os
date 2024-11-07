@@ -15,7 +15,7 @@ public:
     {
         // TODO: add resistance
         aidan::GPIOEventController::get().set_gpio_callback(
-            pin, aidan::InputResistor::PUR, callback
+            pin, aidan::PinPullMode::PUR, callback
         );
     }
 

@@ -35,7 +35,7 @@ public:
 
     // TODO/idea, what if we instead made this a factory?
     void set_gpio_callback(
-        uint32_t pin, InputResistor pin_resistance, GPIOEventCallback callback
+        uint32_t pin, PinPullMode pin_resistance, GPIOEventCallback callback
     );
 
     void clear_gpio_callback(uint32_t pin);

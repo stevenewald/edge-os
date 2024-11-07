@@ -11,14 +11,15 @@ namespace edge::aidan {
 
 // TODO: expose pullup, polarity, etc
 void GPIOEventController::set_gpio_callback(
-    uint32_t pin, InputResistor pin_resistance, GPIOEventCallback callback
+    uint32_t pin, PinPullMode pin_resistance, GPIOEventCallback callback
 )
 {
     callbacks[pin] = callback;
-    auto resistance = static_cast<nrf_gpio_pin_pull_t>(pin_resistance);
 
     // TODO: start high/lwo based on resistance type
-    nrf_gpio_cfg_sense_input(pin, resistance, NRF_GPIO_PIN_SENSE_HIGH);
+    nrf_gpio_cfg_sense_input(
+        pin, to_nrf_gpio_pin_pull(pin_resistance), NRF_GPIO_PIN_SENSE_HIGH
+    );
 }
 
 void GPIOEventController::clear_gpio_callback(uint32_t pin)
@@ -69,7 +70,7 @@ extern "C" {
 void GPIOTE_IRQHandler()
 {
     if (nrf_gpiote_event_is_set(NRF_GPIOTE_EVENTS_PORT)) {
-		GPIOEventController::get().handle_gpiote_port_event();
+        GPIOEventController::get().handle_gpiote_port_event();
         nrf_gpiote_event_clear(NRF_GPIOTE_EVENTS_PORT);
     }
 }

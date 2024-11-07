@@ -38,9 +38,9 @@ void set_gpio_pin_output(uint32_t pin_number)
     nrf_gpio_cfg_output(pin_number);
 }
 
-void set_gpio_pin_input(uint32_t pin_number, InputResistor input_resistor)
+void set_gpio_pin_input(uint32_t pin_number, PinPullMode input_resistor)
 {
-    nrf_gpio_cfg_input(pin_number, static_cast<nrf_gpio_pin_pull_t>(input_resistor));
+    nrf_gpio_cfg_input(pin_number, to_nrf_gpio_pin_pull(input_resistor));
 }
 
 } // namespace edge::aidan
