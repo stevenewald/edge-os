@@ -27,6 +27,9 @@ struct stack_registers {
     unsigned FP_REGS[16]{};
     unsigned FPSCR{};
 
+    // diagram: https://shorturl.at/85lyY
+    unsigned RESERVED_FOR_STACK_ALIGNMENT[2];
+
     stack_registers(unsigned return_addr) : RETURN_ADDR(return_addr) {}
 };
 
