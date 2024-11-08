@@ -121,19 +121,8 @@ __attribute__((used, naked)) void restore_regs()
     // Pop caller saved FP registers
     asm volatile("vpop {s0-s15}");
 
-    // *sigh*
-    // We need to account for whether sp is 4- or 8-byte aligned
-    // diagram: https://shorturl.at/85lyY
-    asm volatile("push {r0}\n"
-                 "mrs r0, psp\n"
-                 "tst r0, #0x4\n"
-                 "pop {r0}\n"
-                 "ite eq\n"
-                 "ADDEQ   SP, #8\n"
-                 "ADDNE   SP, #4");
-
-    // Skip FPSCR (already loaded)
-    asm volatile("add sp, #4");
+    // Skip FPSCR and 2 reserved regs
+    asm volatile("add sp, #12");
 
     asm volatile("ldr pc, [sp, #-84]");
 }
@@ -154,16 +143,6 @@ void Scheduler::yield_current_task()
     // by restore()
     t.stack_ptr_loc = (unsigned*)__get_PSP();
     auto stored_registers = reinterpret_cast<stack_registers*>(t.stack_ptr_loc);
-
-    // Account for stack pointer alignment
-    // diagram: https://shorturl.at/85lyY
-    bool eight_byte_aligned = ((unsigned)t.stack_ptr_loc) & 0x7;
-    if (eight_byte_aligned) {
-        t.stack_ptr_loc -= 1;
-    }
-    else {
-        t.stack_ptr_loc -= 2;
-    }
 
     // "Push" registers, create a fake stack frame
     // This will be popped by the exception handler
