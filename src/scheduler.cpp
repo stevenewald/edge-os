@@ -2,10 +2,33 @@
 
 #include "drivers/driver_controller.hpp"
 #include "nrf52833.h"
+#include "register_utils.hpp"
+
+extern char __start_user_programs_code[];
+extern char __end_user_programs_code[];
+extern char __start_user_programs_data[];
+extern char __end_user_programs_data[];
 
 namespace edge {
 
 Scheduler scheduler;
+
+#define CSP()                  \
+    do {                                                 \
+        int stack_type;                                  \
+        asm volatile (                                   \
+            "TST lr, #4\n\t"                             \
+            "ITE EQ\n\t"                                 \
+            "MOVEQ %[type], #0\n\t"                      \
+            "MOVNE %[type], #1\n\t"                      \
+            : [type] "=r" (stack_type)                   \
+        );                                               \
+        if (stack_type == 0) {                           \
+            printf("Main Stack Pointer (MSP) used\n");   \
+        } else {                                         \
+            printf("Program Stack Pointer (PSP) used\n");\
+        }                                                \
+    } while (0)
 
 void Scheduler::start_scheduler()
 {
@@ -23,6 +46,79 @@ void Scheduler::start_scheduler()
     asm volatile("SVC #0");
 }
 
+void Scheduler::update_mpu_stack_region()
+{
+    MPU->CTRL = 0;
+    // 0: kernel code
+    // Privileged: read only
+    // User: None
+    MPU->RNR = 0;
+    MPU->RBAR = (0 << MPU_RBAR_ADDR_Pos) | (0 << MPU_RBAR_VALID_Pos);
+    MPU->RASR = (0b011 << MPU_RASR_AP_Pos) | (18 << MPU_RASR_SIZE_Pos) | (1 << 0);
+
+    // 1: User code in flash
+    // Privileged: read only
+    // User: read only
+    // MPU->RNR = 1;
+    // MPU->RBAR = (((unsigned)(__start_user_programs_code)) << MPU_RBAR_ADDR_Pos)
+    //             | (0 << MPU_RBAR_VALID_Pos);
+    // MPU->RASR = (0b111 << MPU_RASR_AP_Pos) | (21 << MPU_RASR_SIZE_Pos) | (1 << 0);
+
+    // 2: Flash after user code
+    // Privileged: read
+    // User: none
+    // MPU->RNR = 2;
+    // MPU->RBAR = (((unsigned)(__end_user_programs_code)) << MPU_RBAR_ADDR_Pos)
+    //             | (0 << MPU_RBAR_VALID_Pos);
+    // MPU->RASR = (0b101 << MPU_RASR_AP_Pos) | (21 << MPU_RASR_SIZE_Pos) | (1 << 0);
+
+    // 3: RAM before user data
+    // Privileged: read/write
+    // User: none
+    MPU->RNR = 1;
+    MPU->RBAR =
+        (((unsigned)(0x20000000)) << MPU_RBAR_ADDR_Pos) | (0 << MPU_RBAR_VALID_Pos);
+    MPU->RASR = (0b011 << MPU_RASR_AP_Pos) | (16 << MPU_RASR_SIZE_Pos) | (1 << 0);
+
+
+    // 4: User data in RAM
+    // Privileged: read/write
+    // User: read/write
+    // MPU->RNR = 4;
+    // MPU->RBAR = (((unsigned)(__start_user_programs_data)) << MPU_RBAR_ADDR_Pos)
+    //             | (0 << MPU_RBAR_VALID_Pos);
+    // MPU->RASR = (0b011 << MPU_RASR_AP_Pos) | (21 << MPU_RASR_SIZE_Pos) | (1 << 0);
+
+    // 5: RAM after user data
+    // Privileged: read/write
+    // User: TODO
+    // MPU->RNR = 5;
+    // MPU->RBAR = (((unsigned)(__end_user_programs_data)) << MPU_RBAR_ADDR_Pos)
+    //             | (0 << MPU_RBAR_VALID_Pos);
+    // MPU->RASR = (0b011 << MPU_RASR_AP_Pos) | (21 << MPU_RASR_SIZE_Pos) | (1 << 0);
+
+    static bool t = false;
+    if (!t) {
+        t = true;
+        printf("Start program code %x\n", __start_user_programs_code);
+        printf("End program code %x\n", __end_user_programs_code);
+        printf("Start program data %x\n", __start_user_programs_data);
+        printf("End program data %x\n", __end_user_programs_data);
+        printf("Start of stack %x\n", task_stack[current_task_index].stack.begin());
+    }
+
+    //
+    // MPU->RNR = 6;
+    // MPU->RBAR =
+    //     (((unsigned)task_stack[current_task_index].stack.begin()) <<
+    //     MPU_RBAR_ADDR_Pos) | (0 << MPU_RBAR_VALID_Pos);
+    // MPU->RASR = (0b011 << MPU_RASR_AP_Pos) | (14 << MPU_RASR_SIZE_Pos) | (1 << 0);
+    //
+
+    // Enable MPU with background region enabled
+    MPU->CTRL = MPU_CTRL_ENABLE_Msk | MPU_CTRL_PRIVDEFENA_Msk;
+}
+
 void Scheduler::add_task(void (*function)(void), uint8_t priority)
 {
     task_stack.emplace_back(
@@ -37,8 +133,9 @@ void trigger_pendsv()
 
 void Scheduler::handle_first_svc_hit()
 {
-    // Unprivileged Mode
+
     __set_CONTROL(0x03);
+    // Unprivileged Mode
 
     __set_PSP((unsigned)task_stack[current_task_index].stack_ptr_loc);
 
@@ -58,6 +155,10 @@ extern "C" {
 __attribute__((naked, used)) void PendSV_Handler()
 
 {
+	static int i = 0;
+	if(++i < 10) {
+	CSP();
+	}
     asm volatile("CPSID I");
     if (--scheduler.slices_remaining == 0) {
         asm volatile("mrs r0,psp\n"

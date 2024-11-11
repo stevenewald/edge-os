@@ -1,7 +1,6 @@
-#include "userlib/syscalls.hpp"
-
 #include "drivers/driver_enums.hpp"
 #include "register_utils.hpp"
+#include "userlib/syscalls.hpp"
 #include "userlib/system_call_type.hpp"
 
 #include <stdio.h>

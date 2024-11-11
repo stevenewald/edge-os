@@ -41,12 +41,12 @@ class Scheduler {
         static constexpr size_t STACK_SIZE_IN_UNSIGNED =
             STACK_SIZE_BYTES / sizeof(unsigned);
 
+    public:
         // ===== DO NOT REARRANGE THESE =====
         etl::array<unsigned, STACK_SIZE_IN_UNSIGNED> stack{};
         stack_registers first_stack_frame;
         // ==================================
 
-    public:
         // needs to point to first_stack_frame
         unsigned* stack_ptr_loc{&first_stack_frame.R0};
 
@@ -72,6 +72,7 @@ public:
     void yield_current_task();
 
 private:
+    void update_mpu_stack_region();
     void handle_first_svc_hit();
 
     friend void PendSV_Handler(void);

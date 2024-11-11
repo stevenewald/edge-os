@@ -1,3 +1,4 @@
+#include "nrf52833.h"
 #include "userlib/syscalls.hpp"
 
 template <int N>
@@ -16,6 +17,7 @@ void task(void)
             else
                 flipped = false;
         }
+        // SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
     };
 
     get_button_pressed(ButtonType::A, on_button_press);
@@ -34,7 +36,6 @@ void task(void)
         }
     }
 }
-
 
 template void task<0>(void);
 template void task<1>(void);

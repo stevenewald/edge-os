@@ -1,5 +1,6 @@
 #include "drivers/driver_controller.hpp"
 #include "drivers/driver_enums.hpp"
+#include "register_utils.hpp"
 #include "scheduler.hpp"
 #include "userlib/system_call_type.hpp"
 
@@ -58,6 +59,8 @@ __attribute__((used)) void SVC_Handler(void)
 {
     static bool has_hit = false;
     if (!has_hit) {
+        uint32_t* SP_reg;
+        asm("MRS %0,PSP" : "=r"(SP_reg));
         scheduler.handle_first_svc_hit();
         has_hit = true;
         return;

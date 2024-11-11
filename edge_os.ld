@@ -43,8 +43,8 @@ SECTIONS
   .user_programs_data :
   {
 	  PROVIDE(__start_user_programs_data = .);
-	  _build/user_main.o(.data*)
-	  _build/user_main.o(.bss*)
+	  _build/user_*.o(.data*)
+	  _build/user_*.o(.bss*)
 	  PROVIDE(__end_user_programs_data = .);
   } > RAM
 } INSERT AFTER .data;
@@ -127,8 +127,8 @@ SECTIONS
   .user_programs_code :
   {
 	  PROVIDE(__start_user_programs_code = .);
-	  _build/user_main.o(.text*)
-	  _build/user_main.o(.rodata*)
+	  _build/user_*.o(.text*)
+	  _build/user_*.o(.rodata*)
 	  PROVIDE(__end_user_programs_code = .);
   } > FLASH
 } INSERT AFTER .text
