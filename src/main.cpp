@@ -1,46 +1,19 @@
 #include "drivers/driver_enums.hpp"
 #include "scheduler.hpp"
-#include "userlib/syscalls.hpp"
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <assert.h>
 
 // Pin configurations
 
 template <int N>
-void task(void)
-{
-    using namespace edge::userlib;
-    using namespace edge::drivers;
-    change_priority(1);
+void task(void);
 
-    static bool flipped = false;
-    static void (*on_button_press)(ButtonType, ButtonState) = [](ButtonType type,
-                                                                 ButtonState state) {
-        if (state == ButtonState::DOWN) {
-            if (type == ButtonType::A)
-                flipped = true;
-            else
-                flipped = false;
-        }
-    };
-
-    get_button_pressed(ButtonType::A, on_button_press);
-    get_button_pressed(ButtonType::B, on_button_press);
-
-    while (1) {
-        if (flipped) {
-            set_led(N, 0, true);
-            yield();
-            set_led(N, 0, false);
-        }
-        else {
-            set_led(0, N, true);
-            yield();
-            set_led(0, N, false);
-        }
-    }
-}
+extern char __start_user_programs_code[];
+extern char __end_user_programs_code[];
+extern char __start_user_programs_data[];
+extern char __end_user_programs_data[];
 
 int main(void)
 {
