@@ -6,14 +6,6 @@ namespace edge::userlib {
 
 void change_priority(uint8_t new_priority);
 
-/**
- * We call callbacks by modifying lr and psp
- * Consider what happens if we *don't* inline this function
- * After the SVC call, it will restore the stack frame and b lr
- * We don't want this, because we want to directly jump to the callback
- *
- * In other words, this must be inlined
- */
 void yield();
 
 void set_led(uint8_t row, uint8_t col, bool enabled);
@@ -26,6 +18,10 @@ void get_button_pressed(
     drivers::ButtonType button_type,
     void (*callback)(drivers::ButtonType, drivers::ButtonState)
 );
+
+void send_ipc(uint8_t destination_process_id, uint32_t message);
+
+void subscribe_ipc(void (*callback)(int message));
 
 // We need a syscall for this because SVC will not be preempted by SysTick
 // Technically this is insecure - it's mostly for debugging

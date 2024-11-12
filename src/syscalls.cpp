@@ -1,13 +1,12 @@
 #include "userlib/syscalls.hpp"
 
 #include "drivers/driver_enums.hpp"
+#include "ipc/ipc_command_types.hpp"
 #include "register_utils.hpp"
 #include "userlib/system_call_type.hpp"
 
 #include <stdio.h>
 
-// Compiler should remove this. If not, whatever. lol
-// I think required to avoid messy/unnecessary cleanup at end of func
 #define RETURN_REGISTER(reg)                                                           \
     int ret;                                                                           \
     READ_REGISTER(reg, ret);                                                           \
@@ -23,6 +22,21 @@ void change_priority(uint8_t new_priority)
 void yield()
 {
     TRIGGER_SVC(SystemCallType::YIELD);
+}
+
+void send_ipc(uint8_t destination_process_id, uint32_t message)
+{
+    SET_REGISTER(r0, IPCCommandType::SEND);
+    SET_REGISTER(r1, destination_process_id);
+    SET_REGISTER(r2, message);
+    TRIGGER_SVC(SystemCallType::IPC);
+}
+
+void subscribe_ipc(void (*callback)(int message))
+{
+    SET_REGISTER(r0, IPCCommandType::REGISTER);
+    SET_REGISTER(r1, callback);
+    TRIGGER_SVC(SystemCallType::IPC);
 }
 
 void get_button_pressed(
