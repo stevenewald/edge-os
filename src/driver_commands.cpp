@@ -1,6 +1,6 @@
-#include "drivers/driver_controller.hpp"
+#include "drivers/driver_commands.hpp"
 
-#include "drivers/buttons.hpp"
+#include "drivers/button_driver.hpp"
 #include "drivers/driver_enums.hpp"
 #include "drivers/led_display.hpp"
 #include "drivers/timer.hpp"
@@ -8,6 +8,7 @@
 #include <stdio.h>
 
 namespace edge::drivers {
+
 // Runs on context switch
 void do_async_work()
 {
@@ -26,7 +27,9 @@ etl::optional<int> handle_command(DriverCommand type, int arg1, int arg2, int ar
             printf((char*)arg1);
             break;
         case DriverCommand::BUTTONS:
-            return button_controller.get_button_pressed(static_cast<ButtonType>(arg1));
+            return ButtonController::get().get_button_pressed(
+                static_cast<ButtonType>(arg1)
+            );
     }
     return etl::nullopt;
 }
@@ -38,16 +41,11 @@ void handle_subscribe(
 {
     switch (type) {
         case DriverSubscribe::NOTIFY_BUTTON_PRESS:
-            button_controller.subscribe_button_press(
+            ButtonController::get().subscribe_button_press(
                 static_cast<ButtonType>(arg1), callback, process_id
             );
             break;
     }
-}
-
-etl::optional<subscribe_callback> get_ready_callback(uint8_t process_id)
-{
-    return button_controller.get_ready_callback(process_id);
 }
 
 } // namespace edge::drivers

@@ -1,7 +1,8 @@
 #include "scheduler.hpp"
 
-#include "drivers/driver_controller.hpp"
+#include "drivers/driver_commands.hpp"
 #include "nrf52833.h"
+#include "process_callback_storage.hpp"
 
 namespace edge {
 
@@ -129,7 +130,8 @@ __attribute__((used, naked)) void restore_regs()
 
 void Scheduler::yield_current_task()
 {
-    auto callback_opt = drivers::get_ready_callback(current_task_index);
+    auto callback_opt =
+        ProcessCallbackStorage::get().get_ready_callback(current_task_index);
     if (!callback_opt) {
         // Expire turn
         slices_remaining = 1;
