@@ -1,6 +1,7 @@
 #pragma once
 
 #include "drivers/driver_enums.hpp"
+#include "util.hpp"
 
 namespace edge::userlib {
 
@@ -19,9 +20,9 @@ void get_button_pressed(
     void (*callback)(drivers::ButtonType, drivers::ButtonState)
 );
 
-void send_ipc(uint8_t destination_process_id, uint32_t message);
+void send_ipc(const ProcessName& name, uint32_t message);
 
-void subscribe_ipc(void (*callback)(int message));
+void subscribe_ipc(const ProcessName& name, void (*callback)(int message));
 
 // We need a syscall for this because SVC will not be preempted by SysTick
 // Technically this is insecure - it's mostly for debugging

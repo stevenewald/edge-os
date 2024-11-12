@@ -24,18 +24,19 @@ void yield()
     TRIGGER_SVC(SystemCallType::YIELD);
 }
 
-void send_ipc(uint8_t destination_process_id, uint32_t message)
+void send_ipc(const ProcessName& name, uint32_t message)
 {
     SET_REGISTER(r0, IPCCommandType::SEND);
-    SET_REGISTER(r1, destination_process_id);
+    SET_REGISTER(r1, name.data());
     SET_REGISTER(r2, message);
     TRIGGER_SVC(SystemCallType::IPC);
 }
 
-void subscribe_ipc(void (*callback)(int message))
+void subscribe_ipc(const ProcessName& name, void (*callback)(int message))
 {
     SET_REGISTER(r0, IPCCommandType::REGISTER);
-    SET_REGISTER(r1, callback);
+    SET_REGISTER(r1, name.data());
+    SET_REGISTER(r2, callback);
     TRIGGER_SVC(SystemCallType::IPC);
 }
 

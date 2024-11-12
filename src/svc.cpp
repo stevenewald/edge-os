@@ -40,14 +40,18 @@ void handle_driver_subscribe(uint32_t* stack_ptr)
 void handle_ipc(uint32_t* stack_ptr)
 {
     auto type = static_cast<IPCCommandType>(stack_ptr[0]);
+    auto name = reinterpret_cast<const char*>(stack_ptr[1]);
+    etl::string<20> name_str{name};
+
     if (type == IPCCommandType::SEND) [[likely]] {
-        auto destination_process_id = static_cast<uint8_t>(stack_ptr[1]);
         auto message = static_cast<int>(stack_ptr[2]);
-        IPCManager::get().send_message(destination_process_id, message);
+        IPCManager::get().send_message(name_str, message);
     }
     else if (type == IPCCommandType::REGISTER) {
-        auto callback = reinterpret_cast<ProcessCallbackPtr>(stack_ptr[1]);
-        IPCManager::get().register_callback(scheduler.get_current_task(), callback);
+        auto callback = reinterpret_cast<ProcessCallbackPtr>(stack_ptr[2]);
+        IPCManager::get().register_callback(
+            scheduler.get_current_task(), name_str, callback
+        );
     }
     else {
         panic("Unknown IPC command type received");

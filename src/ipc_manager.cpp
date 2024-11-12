@@ -12,23 +12,28 @@ IPCManager& IPCManager::get()
     return ipc_manager;
 }
 
-void IPCManager::register_callback(uint8_t process_id, ProcessCallbackPtr callback)
+void IPCManager::register_callback(
+    uint8_t process_id, const ProcessName& new_process_name, ProcessCallbackPtr callback
+)
 {
+    if (ipc_communicators[process_id] != nullptr) [[unlikely]] {
+        panic("IPC registered twice for a process");
+    }
+
     ipc_communicators[process_id] = callback;
+    name_to_id[new_process_name] = process_id;
 }
 
-void IPCManager::send_message(uint8_t destination_process_id, int value)
+void IPCManager::send_message(const ProcessName& destination_name, int value)
 {
-    if (!ipc_communicators[destination_process_id]) {
-        printf(
-            "Sent message to process %d which has not been registered\n",
-            destination_process_id
-        );
+    if (name_to_id.find(destination_name) == name_to_id.end()) [[unlikely]] {
+        printf("IPC sent but no process matched name %s\n", destination_name.data());
         return;
     }
 
-    ProcessCallbackStorage::get().add_ready_callback(
-        destination_process_id, *ipc_communicators[destination_process_id], value
-    );
+    auto process_id = name_to_id[destination_name];
+    auto callback = ipc_communicators[process_id];
+    ProcessCallbackStorage::get().add_ready_callback(process_id, callback, value);
+    return;
 }
 } // namespace edge

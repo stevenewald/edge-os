@@ -9,15 +9,14 @@ void task1(void)
 {
     using namespace edge::userlib;
     using namespace edge::drivers;
-    change_priority(1);
 
     static void (*on_button_press)(ButtonType, ButtonState) = [](ButtonType type,
                                                                  ButtonState state) {
         if (state == ButtonState::DOWN) {
             if (type == ButtonType::A)
-                send_ipc(0, true);
+                send_ipc("LED_DISPLAY", true);
             else
-                send_ipc(0, false);
+                send_ipc("LED_DISPLAY", false);
         }
     };
 
@@ -32,13 +31,11 @@ void task1(void)
 void task0(void)
 {
     using namespace edge::userlib;
-    using namespace edge::drivers;
-    change_priority(1);
 
     static bool flipped = false;
-    static void (*ipc_callback)(int) = [](int value) { flipped = (bool)value; };
+    static void (*ipc_callback)(int) = [](int value) { flipped = value; };
 
-    subscribe_ipc(ipc_callback);
+    subscribe_ipc("LED_DISPLAY", ipc_callback);
 
     while (1) {
         if (flipped) {
