@@ -24,10 +24,10 @@ public:
 
     static GPIOEventController& get();
 
-    GPIOEventController& operator=(const GPIOEventController&) = delete;
-    GPIOEventController& operator=(GPIOEventController&&) = delete;
-    GPIOEventController(const GPIOEventController&) = delete;
-    GPIOEventController(GPIOEventController&&) = delete;
+    // GPIOEventController& operator=(const GPIOEventController&) = delete;
+    // GPIOEventController& operator=(GPIOEventController&&) = delete;
+    // GPIOEventController(const GPIOEventController&) = delete;
+    // GPIOEventController(GPIOEventController&&) = delete;
 
     // TODO/idea, what if we instead made this a factory?
     void set_gpio_callback(
