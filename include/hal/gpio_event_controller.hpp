@@ -11,10 +11,10 @@ static constexpr uint8_t GPIO_PINS = 32;
 // TODO: Add a controller for other GPIOTE events (channels)?
 class GPIOEventController {
 public:
-    using GPIOEventCallback = void (*)(nrf_gpio_pin_sense_t sense, int pin);
+    using GPIOEventCallback = etl::delegate<void(nrf_gpio_pin_sense_t, int)>;
 
 private:
-    etl::array<GPIOEventCallback, GPIO_PINS> callbacks{nullptr};
+    etl::array<etl::optional<GPIOEventCallback>, GPIO_PINS> callbacks{etl::nullopt};
 
     void handle_gpiote_port_event() const;
     GPIOEventController();
@@ -22,11 +22,7 @@ private:
 public:
     ~GPIOEventController();
 
-    static GPIOEventController& get()
-    {
-        static GPIOEventController controller;
-        return controller;
-    }
+    static GPIOEventController& get();
 
     GPIOEventController& operator=(const GPIOEventController&) = delete;
     GPIOEventController& operator=(GPIOEventController&&) = delete;

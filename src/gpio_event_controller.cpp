@@ -22,9 +22,15 @@ void GPIOEventController::set_gpio_callback(
     );
 }
 
+GPIOEventController& GPIOEventController::get()
+{
+    static GPIOEventController controller;
+    return controller;
+}
+
 void GPIOEventController::clear_gpio_callback(uint32_t pin)
 {
-    callbacks[pin] = nullptr;
+    callbacks[pin] = etl::nullopt;
     nrf_gpio_cfg_sense_input(pin, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_NOSENSE);
 }
 
@@ -59,8 +65,8 @@ void GPIOEventController::handle_gpiote_port_event() const
         nrf_gpio_cfg_sense_input(pin, nrf_gpio_pin_pull_get(pin), opposite_state);
 
         auto callback = GPIOEventController::get().callbacks[pin];
-        if (callback != nullptr) {
-            callback(state, pin);
+        if (callback) {
+            callback.value()(state, pin);
         }
     }
     NRF_GPIO->LATCH = latch;
