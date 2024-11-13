@@ -1,5 +1,5 @@
 #include "drivers/driver_enums.hpp"
-#include "error_handler.hpp"
+#include "fault_handler.hpp"
 #include "scheduler.hpp"
 #include "userlib/syscalls.hpp"
 #include "util.hpp"
@@ -9,7 +9,14 @@
 
 void task1(void)
 {
-    auto trigger_faults = []() { asm volatile(".word 0xFFFFFFFF"); };
+    auto trigger_faults = []() {
+        // Usage
+        asm volatile(".word 0xFFFFFFFF");
+
+        // Bus
+        volatile uint32_t* invalid_address = (uint32_t*)0xFFFFFFF0;
+        [[maybe_unused]] uint32_t value = *invalid_address;
+    };
 
     using namespace edge::userlib;
     using namespace edge::drivers;
@@ -18,6 +25,13 @@ void task1(void)
         switch (type) {
             case edge::FaultType::Usage:
                 debug_println(etl::string<25>{"USAGE FAULT TRIGGERED"});
+                break;
+            case edge::FaultType::Bus:
+                debug_println(etl::string<25>{"BUS FAULT TRIGGERED"});
+                break;
+            case edge::FaultType::Memory:
+                debug_println(etl::string<25>{"MEMORY FAULT TRIGGERED"});
+                break;
         }
     };
 
@@ -70,7 +84,7 @@ int main(void)
 {
     printf("Starting EdgeOS\n");
 
-    edge::ErrorHandler::get();
+    edge::FaultHandler::get();
 
     edge::scheduler.add_task(task0);
     edge::scheduler.add_task(task1);

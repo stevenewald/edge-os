@@ -1,6 +1,6 @@
 #include "drivers/driver_commands.hpp"
 #include "drivers/driver_enums.hpp"
-#include "error_handler.hpp"
+#include "fault_handler.hpp"
 #include "ipc/ipc_command_types.hpp"
 #include "ipc/ipc_manager.hpp"
 #include "scheduler.hpp"
@@ -44,7 +44,7 @@ void handle_set_fault_handler(uint32_t* stack_ptr)
 {
     uint32_t current_task_id = scheduler.get_current_task();
     auto callback = reinterpret_cast<ProcessCallbackPtr>(stack_ptr[0]);
-    ErrorHandler::get().set_fault_callback(current_task_id, callback);
+    FaultHandler::get().set_fault_callback(current_task_id, callback);
 }
 
 void handle_ipc(uint32_t* stack_ptr)

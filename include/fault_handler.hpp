@@ -5,19 +5,19 @@
 
 namespace edge {
 
-class ErrorHandler {
-    ErrorHandler();
-    ~ErrorHandler();
+class FaultHandler {
+    FaultHandler();
+    ~FaultHandler();
 
     etl::array<etl::optional<ProcessCallbackPtr>, MAX_PROCESSES> error_callbacks;
 
 public:
-    ErrorHandler(const ErrorHandler&) = delete;
-    ErrorHandler(ErrorHandler&&) = delete;
-    ErrorHandler& operator=(const ErrorHandler&) = delete;
-    ErrorHandler& operator=(ErrorHandler&&) = delete;
+    FaultHandler(const FaultHandler&) = delete;
+    FaultHandler(FaultHandler&&) = delete;
+    FaultHandler& operator=(const FaultHandler&) = delete;
+    FaultHandler& operator=(FaultHandler&&) = delete;
 
-    static ErrorHandler& get();
+    static FaultHandler& get();
 
     // To be called by raw handlers in raw_fault_handling.cpp
     void fault_triggered(FaultType fault_type, uint32_t* stack_ptr);

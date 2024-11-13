@@ -1,4 +1,4 @@
-#include "error_handler.hpp"
+#include "fault_handler.hpp"
 
 #include "nrf52.h"
 #include "pending_process_callbacks.hpp"
@@ -18,23 +18,37 @@ uint32_t increment_pc(uint32_t program_counter)
 }
 } // namespace
 
-ErrorHandler::ErrorHandler()
+FaultHandler::FaultHandler()
 {
+    // Enable UsageFault
     SCB->SHCSR |= SCB_SHCSR_USGFAULTENA_Msk;
+
+    // Enable BusFault
+    SCB->SHCSR |= SCB_SHCSR_BUSFAULTENA_Msk;
+
+    // Enable MemoryFault
+    SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk;
 }
 
-ErrorHandler::~ErrorHandler()
+FaultHandler::~FaultHandler()
 {
+    // Disable UsageFault
     SCB->SHCSR &= ~SCB_SHCSR_USGFAULTENA_Msk;
+
+    // Disable BusFault
+    SCB->SHCSR &= ~SCB_SHCSR_BUSFAULTENA_Msk;
+
+    // Disable MemoryFault
+    SCB->SHCSR &= ~SCB_SHCSR_MEMFAULTENA_Msk;
 }
 
-ErrorHandler& ErrorHandler::get()
+FaultHandler& FaultHandler::get()
 {
-    static ErrorHandler error_handler;
-    return error_handler;
+    static FaultHandler fault_handler;
+    return fault_handler;
 }
 
-void ErrorHandler::set_fault_callback(
+void FaultHandler::set_fault_callback(
     uint8_t process_id, ProcessCallbackPtr callback_ptr
 )
 {
@@ -45,7 +59,7 @@ void ErrorHandler::set_fault_callback(
     error_callbacks[process_id] = callback_ptr;
 }
 
-void ErrorHandler::fault_triggered(FaultType fault_type, uint32_t* stack_ptr)
+void FaultHandler::fault_triggered(FaultType fault_type, uint32_t* stack_ptr)
 {
     uint8_t current_task = scheduler.get_current_task();
     if (!error_callbacks[current_task].has_value()) [[unlikely]] {
@@ -54,7 +68,8 @@ void ErrorHandler::fault_triggered(FaultType fault_type, uint32_t* stack_ptr)
 
     stack_ptr[6] = increment_pc(stack_ptr[6]);
     PendingProcessCallbacks::get().add_ready_callback(
-        current_task, error_callbacks[current_task].value()
+        current_task, error_callbacks[current_task].value(),
+        static_cast<int>(fault_type)
     );
 }
 } // namespace edge
