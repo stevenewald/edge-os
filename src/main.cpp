@@ -7,7 +7,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-void task1(void)
+void exception_task(void)
 {
     auto trigger_faults = []() {
         // Usage
@@ -19,8 +19,6 @@ void task1(void)
     };
 
     using namespace edge::userlib;
-    using namespace edge::drivers;
-
     static void (*fault_handler)(edge::FaultType) = [](edge::FaultType type) {
         switch (type) {
             case edge::FaultType::Usage:
@@ -35,6 +33,22 @@ void task1(void)
         }
     };
 
+    set_fault_handler(fault_handler);
+
+    trigger_faults();
+
+    set_led(2, 2, true);
+
+    while (1) {
+        yield();
+    }
+}
+
+void task1(void)
+{
+    using namespace edge::userlib;
+    using namespace edge::drivers;
+
     static void (*on_button_press)(ButtonType, ButtonState) = [](ButtonType type,
                                                                  ButtonState state) {
         if (state == ButtonState::DOWN) {
@@ -47,10 +61,6 @@ void task1(void)
 
     get_button_pressed(ButtonType::A, on_button_press);
     get_button_pressed(ButtonType::B, on_button_press);
-
-    set_fault_handler(fault_handler);
-
-    trigger_faults();
 
     while (1) {
         yield();
@@ -86,6 +96,7 @@ int main(void)
 
     edge::FaultHandler::get();
 
+    edge::scheduler.add_task(exception_task);
     edge::scheduler.add_task(task0);
     edge::scheduler.add_task(task1);
 

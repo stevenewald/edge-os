@@ -1,6 +1,6 @@
 #pragma once
-
 #include "config.hpp"
+#include "util.hpp"
 
 #include <stdio.h>
 
@@ -15,24 +15,6 @@ void PendSV_Handler();
 void SVC_Handler();
 }
 
-struct stack_registers {
-    unsigned R0{};
-    unsigned R1{};
-    unsigned R2{};
-    unsigned R3{};
-    unsigned R12{};
-    unsigned LR{};
-    unsigned RETURN_ADDR{};
-    unsigned CTRL{0x01000000};
-    unsigned FP_REGS[16]{};
-    unsigned FPSCR{};
-
-    // diagram: https://shorturl.at/85lyY
-    unsigned RESERVED_FOR_STACK_ALIGNMENT[2];
-
-    stack_registers(unsigned return_addr) : RETURN_ADDR(return_addr) {}
-};
-
 class Scheduler {
     unsigned current_task_index = 0;
     uint8_t slices_remaining = 1;
@@ -43,7 +25,7 @@ class Scheduler {
 
         // ===== DO NOT REARRANGE THESE =====
         etl::array<unsigned, STACK_SIZE_IN_UNSIGNED> stack{};
-        stack_registers first_stack_frame;
+        exception_stack_registers first_stack_frame;
         // ==================================
 
     public:
@@ -53,7 +35,10 @@ class Scheduler {
         // This is useful if we want to adjust the ratio of driver to process runtime
         uint8_t consecutive_quantums_to_run;
 
-        Task(const stack_registers& initial_stack_frame, uint8_t initial_priority) :
+        Task(
+            const exception_stack_registers& initial_stack_frame,
+            uint8_t initial_priority
+        ) :
             first_stack_frame(initial_stack_frame),
             consecutive_quantums_to_run(initial_priority)
         {}
@@ -67,6 +52,7 @@ public:
     void add_task(void (*function)(void), uint8_t priority = 1);
 
     void start_scheduler();
+
     void change_current_task_priority(uint8_t new_priority);
 
     void yield_current_task();
