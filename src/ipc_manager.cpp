@@ -1,6 +1,6 @@
 #include "ipc/ipc_manager.hpp"
 
-#include "process_callback_storage.hpp"
+#include "pending_process_callbacks.hpp"
 #include "util.hpp"
 
 #include <stdio.h>
@@ -33,7 +33,7 @@ void IPCManager::send_message(const ProcessName& destination_name, int value)
 
     auto process_id = name_to_id[destination_name];
     auto callback = ipc_communicators[process_id];
-    ProcessCallbackStorage::get().add_ready_callback(process_id, callback, value);
+    PendingProcessCallbacks::get().add_ready_callback(process_id, callback, value);
     return;
 }
 } // namespace edge

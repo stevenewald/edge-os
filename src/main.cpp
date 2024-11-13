@@ -1,14 +1,25 @@
 #include "drivers/driver_enums.hpp"
+#include "error_handler.hpp"
 #include "scheduler.hpp"
 #include "userlib/syscalls.hpp"
+#include "util.hpp"
 
 #include <stdbool.h>
 #include <stdio.h>
 
 void task1(void)
 {
+    auto trigger_faults = []() { asm volatile(".word 0xFFFFFFFF"); };
+
     using namespace edge::userlib;
     using namespace edge::drivers;
+
+    static void (*fault_handler)(edge::FaultType) = [](edge::FaultType type) {
+        switch (type) {
+            case edge::FaultType::Usage:
+                debug_println(etl::string<25>{"USAGE FAULT TRIGGERED"});
+        }
+    };
 
     static void (*on_button_press)(ButtonType, ButtonState) = [](ButtonType type,
                                                                  ButtonState state) {
@@ -22,6 +33,10 @@ void task1(void)
 
     get_button_pressed(ButtonType::A, on_button_press);
     get_button_pressed(ButtonType::B, on_button_press);
+
+    set_fault_handler(fault_handler);
+
+    trigger_faults();
 
     while (1) {
         yield();
@@ -54,6 +69,8 @@ void task0(void)
 int main(void)
 {
     printf("Starting EdgeOS\n");
+
+    edge::ErrorHandler::get();
 
     edge::scheduler.add_task(task0);
     edge::scheduler.add_task(task1);

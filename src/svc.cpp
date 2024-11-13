@@ -1,5 +1,6 @@
 #include "drivers/driver_commands.hpp"
 #include "drivers/driver_enums.hpp"
+#include "error_handler.hpp"
 #include "ipc/ipc_command_types.hpp"
 #include "ipc/ipc_manager.hpp"
 #include "scheduler.hpp"
@@ -9,6 +10,8 @@
 #include <cstdio>
 
 namespace edge {
+
+// TODO: replace uint32_t* stack_ptr with an actual structure
 
 void handle_yield()
 {
@@ -35,6 +38,13 @@ void handle_driver_subscribe(uint32_t* stack_ptr)
     return drivers::handle_subscribe(
         type, callback, arg1, arg2, scheduler.get_current_task()
     );
+}
+
+void handle_set_fault_handler(uint32_t* stack_ptr)
+{
+    uint32_t current_task_id = scheduler.get_current_task();
+    auto callback = reinterpret_cast<ProcessCallbackPtr>(stack_ptr[0]);
+    ErrorHandler::get().set_fault_callback(current_task_id, callback);
 }
 
 void handle_ipc(uint32_t* stack_ptr)
@@ -75,6 +85,9 @@ etl::optional<int> handle_call(uint32_t* stack_ptr)
             break;
         case edge::SystemCallType::IPC:
             handle_ipc(stack_ptr);
+            break;
+        case edge::SystemCallType::SET_FAULT_HANDLER:
+            handle_set_fault_handler(stack_ptr);
             break;
     }
     return etl::nullopt;

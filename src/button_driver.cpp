@@ -1,7 +1,7 @@
 #include "drivers/button_driver.hpp"
 
 #include "drivers/driver_enums.hpp"
-#include "process_callback_storage.hpp"
+#include "pending_process_callbacks.hpp"
 
 namespace edge::drivers {
 
@@ -52,7 +52,7 @@ void ButtonController::handle_button_press(ButtonType type, ButtonState state)
         type == ButtonType::A ? a_subscriptions : b_subscriptions;
     for (int process_id = 0; process_id < MAX_PROCESSES; process_id++) {
         if (button_subscriptions[process_id] != nullptr) {
-            ProcessCallbackStorage::get().add_ready_callback(
+            PendingProcessCallbacks::get().add_ready_callback(
                 process_id, button_subscriptions[process_id], static_cast<int>(type),
                 static_cast<int>(state)
             );
