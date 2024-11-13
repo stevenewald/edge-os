@@ -25,7 +25,7 @@ ButtonController::ButtonController() :
 {}
 
 void ButtonController::subscribe_button_press(
-    ButtonType type, SubscribeCallbackPtr callback, uint8_t process_id
+    ButtonType type, ProcessCallbackPtr callback, uint8_t process_id
 )
 {
     if (type == ButtonType::A) {

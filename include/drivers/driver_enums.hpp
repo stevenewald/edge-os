@@ -1,5 +1,7 @@
 #pragma once
 
+#include "util.hpp"
+
 namespace edge::drivers {
 enum class DriverCommand {
     GET_TIME = 0,
@@ -15,10 +17,8 @@ enum class GPIOConfiguration { OUT, IN_NORES, IN_PDR, IN_PUR };
 enum class ButtonType { A = 0, B = 1 };
 enum class ButtonState { UP = 0, DOWN = 1 };
 
-using SubscribeCallbackPtr = void (*)(int, int);
-
 struct subscribe_callback {
-    SubscribeCallbackPtr callback;
+    ProcessCallbackPtr callback;
     int arg1;
     int arg2;
 };

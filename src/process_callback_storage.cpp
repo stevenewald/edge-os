@@ -11,7 +11,7 @@ ProcessCallbackStorage& ProcessCallbackStorage::get()
 }
 
 void ProcessCallbackStorage::add_ready_callback(
-    uint8_t process_id, drivers::SubscribeCallbackPtr callback, int arg1, int arg2
+    uint8_t process_id, ProcessCallbackPtr callback, int arg1, int arg2
 )
 {
     if (ready_callbacks[process_id].size() == MAX_READY_CALLBACKS) {

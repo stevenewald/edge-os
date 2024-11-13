@@ -5,23 +5,18 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-// Pin configurations
-
-template <int N>
-void task(void)
+void task1(void)
 {
     using namespace edge::userlib;
     using namespace edge::drivers;
-    change_priority(1);
 
-    static bool flipped = false;
     static void (*on_button_press)(ButtonType, ButtonState) = [](ButtonType type,
                                                                  ButtonState state) {
         if (state == ButtonState::DOWN) {
             if (type == ButtonType::A)
-                flipped = true;
+                send_ipc("LED_DISPLAY", true);
             else
-                flipped = false;
+                send_ipc("LED_DISPLAY", false);
         }
     };
 
@@ -29,15 +24,29 @@ void task(void)
     get_button_pressed(ButtonType::B, on_button_press);
 
     while (1) {
+        yield();
+    }
+}
+
+void task0(void)
+{
+    using namespace edge::userlib;
+
+    static bool flipped = false;
+    static void (*ipc_callback)(int) = [](int value) { flipped = value; };
+
+    subscribe_ipc("LED_DISPLAY", ipc_callback);
+
+    while (1) {
         if (flipped) {
-            set_led(N, 0, true);
+            set_led(4, 0, true);
             yield();
-            set_led(N, 0, false);
+            set_led(4, 0, false);
         }
         else {
-            set_led(0, N, true);
+            set_led(0, 4, true);
             yield();
-            set_led(0, N, false);
+            set_led(0, 4, false);
         }
     }
 }
@@ -46,11 +55,8 @@ int main(void)
 {
     printf("Starting EdgeOS\n");
 
-    edge::scheduler.add_task(task<4>);
-    edge::scheduler.add_task(task<3>);
-    edge::scheduler.add_task(task<2>);
-    edge::scheduler.add_task(task<1>);
-    edge::scheduler.add_task(task<0>);
+    edge::scheduler.add_task(task0);
+    edge::scheduler.add_task(task1);
 
     edge::scheduler.start_scheduler();
 }

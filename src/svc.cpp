@@ -1,7 +1,10 @@
 #include "drivers/driver_commands.hpp"
 #include "drivers/driver_enums.hpp"
+#include "ipc/ipc_command_types.hpp"
+#include "ipc/ipc_manager.hpp"
 #include "scheduler.hpp"
 #include "userlib/system_call_type.hpp"
+#include "util.hpp"
 
 #include <cstdio>
 
@@ -26,12 +29,33 @@ etl::optional<int> handle_driver_command(uint32_t* stack_ptr)
 void handle_driver_subscribe(uint32_t* stack_ptr)
 {
     auto type = static_cast<drivers::DriverSubscribe>(stack_ptr[0]);
-    auto callback = reinterpret_cast<drivers::SubscribeCallbackPtr>(stack_ptr[1]);
+    auto callback = reinterpret_cast<ProcessCallbackPtr>(stack_ptr[1]);
     int arg1 = stack_ptr[2];
     int arg2 = stack_ptr[3];
     return drivers::handle_subscribe(
         type, callback, arg1, arg2, scheduler.get_current_task()
     );
+}
+
+void handle_ipc(uint32_t* stack_ptr)
+{
+    auto type = static_cast<IPCCommandType>(stack_ptr[0]);
+    auto name = reinterpret_cast<const char*>(stack_ptr[1]);
+    etl::string<20> name_str{name};
+
+    if (type == IPCCommandType::SEND) [[likely]] {
+        auto message = static_cast<int>(stack_ptr[2]);
+        IPCManager::get().send_message(name_str, message);
+    }
+    else if (type == IPCCommandType::REGISTER) {
+        auto callback = reinterpret_cast<ProcessCallbackPtr>(stack_ptr[2]);
+        IPCManager::get().register_callback(
+            scheduler.get_current_task(), name_str, callback
+        );
+    }
+    else {
+        panic("Unknown IPC command type received");
+    }
 }
 
 etl::optional<int> handle_call(uint32_t* stack_ptr)
@@ -48,6 +72,9 @@ etl::optional<int> handle_call(uint32_t* stack_ptr)
             return handle_driver_command(stack_ptr);
         case SystemCallType::SUBSCRIBE:
             handle_driver_subscribe(stack_ptr);
+            break;
+        case edge::SystemCallType::IPC:
+            handle_ipc(stack_ptr);
             break;
     }
     return etl::nullopt;

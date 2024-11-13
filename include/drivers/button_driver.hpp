@@ -17,7 +17,7 @@ class ButtonController {
     GPIOPinEvent event_a;
     GPIOPinEvent event_b;
 
-    using SubscriptionArray = etl::array<SubscribeCallbackPtr, MAX_PROCESSES>;
+    using SubscriptionArray = etl::array<ProcessCallbackPtr, MAX_PROCESSES>;
     SubscriptionArray a_subscriptions;
     SubscriptionArray b_subscriptions;
 
@@ -35,7 +35,7 @@ public:
     bool get_button_pressed(ButtonType button_type);
 
     void subscribe_button_press(
-        ButtonType type, SubscribeCallbackPtr callback, uint8_t process_id
+        ButtonType type, ProcessCallbackPtr callback, uint8_t process_id
     );
 };
 } // namespace edge::drivers

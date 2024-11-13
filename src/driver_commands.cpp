@@ -35,7 +35,7 @@ etl::optional<int> handle_command(DriverCommand type, int arg1, int arg2, int ar
 }
 
 void handle_subscribe(
-    DriverSubscribe type, SubscribeCallbackPtr callback, int arg1, int arg2,
+    DriverSubscribe type, ProcessCallbackPtr callback, int arg1, int arg2,
     uint8_t process_id
 )
 {
