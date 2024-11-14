@@ -6,7 +6,7 @@ void exception_task(void)
         // Usage
         asm volatile(".word 0xFFFFFFFF");
 
-        // Bus
+        // Memory
         volatile uint32_t* invalid_address = (uint32_t*)0xFFFFFFF0;
         [[maybe_unused]] uint32_t value = *invalid_address;
     };
@@ -15,13 +15,13 @@ void exception_task(void)
     static void (*fault_handler)(edge::FaultType) = [](edge::FaultType type) {
         switch (type) {
             case edge::FaultType::Usage:
-                debug_println(etl::string<25>{"USAGE FAULT TRIGGERED"});
+                debug_print("USAGE FAULT TRIGGERED\n");
                 break;
             case edge::FaultType::Bus:
-                debug_println(etl::string<25>{"BUS FAULT TRIGGERED"});
+                debug_print("BUS FAULT TRIGGERED\n");
                 break;
             case edge::FaultType::Memory:
-                debug_println(etl::string<25>{"MEMORY FAULT TRIGGERED"});
+                debug_print("MEMORY FAULT TRIGGERED\n");
                 break;
         }
     };

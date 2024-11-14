@@ -3,7 +3,7 @@
 #include "fault_handler.hpp"
 #include "ipc/ipc_command_types.hpp"
 #include "ipc/ipc_manager.hpp"
-#include "scheduler.hpp"
+#include "scheduler/scheduler.hpp"
 #include "userlib/system_call_type.hpp"
 #include "util.hpp"
 

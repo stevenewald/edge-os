@@ -4,6 +4,7 @@
 #include "ipc/ipc_command_types.hpp"
 #include "register_utils.hpp"
 #include "userlib/system_call_type.hpp"
+#include "util.hpp"
 
 #include <stdio.h>
 
@@ -13,40 +14,40 @@
     return ret;
 
 namespace edge::userlib {
-void change_priority(uint8_t new_priority)
+void USER_CODE change_priority(uint8_t new_priority)
 {
     SET_REGISTER(r0, new_priority);
     TRIGGER_SVC(SystemCallType::CHANGE_PRIORITY);
 }
 
-void yield()
+void USER_CODE yield()
 {
     TRIGGER_SVC(SystemCallType::YIELD);
 }
 
-void set_fault_handler(void (*callback)(FaultType))
+void USER_CODE set_fault_handler(void (*callback)(FaultType))
 {
     SET_REGISTER(r0, callback);
     TRIGGER_SVC(SystemCallType::SET_FAULT_HANDLER);
 }
 
-void send_ipc(const ProcessName& name, uint32_t message)
+void USER_CODE send_ipc(const char* name, uint32_t message)
 {
     SET_REGISTER(r0, IPCCommandType::SEND);
-    SET_REGISTER(r1, name.data());
+    SET_REGISTER(r1, name);
     SET_REGISTER(r2, message);
     TRIGGER_SVC(SystemCallType::IPC);
 }
 
-void subscribe_ipc(const ProcessName& name, void (*callback)(int message))
+void USER_CODE subscribe_ipc(const char* name, void (*callback)(int message))
 {
     SET_REGISTER(r0, IPCCommandType::REGISTER);
-    SET_REGISTER(r1, name.data());
+    SET_REGISTER(r1, name);
     SET_REGISTER(r2, callback);
     TRIGGER_SVC(SystemCallType::IPC);
 }
 
-void get_button_pressed(
+void USER_CODE get_button_pressed(
     drivers::ButtonType button_type,
     void (*callback)(drivers::ButtonType, drivers::ButtonState)
 )
@@ -57,7 +58,7 @@ void get_button_pressed(
     TRIGGER_SVC(SystemCallType::SUBSCRIBE);
 }
 
-void set_led(uint8_t row, uint8_t col, bool enabled)
+void USER_CODE set_led(uint8_t row, uint8_t col, bool enabled)
 {
     SET_REGISTER(r0, (int)drivers::DriverCommand::LED_DISPLAY);
     SET_REGISTER(r1, (int)row);
@@ -66,7 +67,7 @@ void set_led(uint8_t row, uint8_t col, bool enabled)
     TRIGGER_SVC(SystemCallType::COMMAND);
 }
 
-bool get_button_pressed(drivers::ButtonType button_type)
+bool USER_CODE get_button_pressed(drivers::ButtonType button_type)
 {
     SET_REGISTER(r0, (int)drivers::DriverCommand::BUTTONS);
     SET_REGISTER(r1, button_type);
@@ -74,14 +75,14 @@ bool get_button_pressed(drivers::ButtonType button_type)
     RETURN_REGISTER(r0);
 }
 
-int get_time_us()
+int USER_CODE get_time_us()
 {
     SET_REGISTER(r0, (int)drivers::DriverCommand::GET_TIME);
     TRIGGER_SVC(SystemCallType::COMMAND);
     RETURN_REGISTER(r0);
 }
 
-void debug_print(const char* val)
+void USER_CODE debug_print(const char* val)
 {
     SET_REGISTER(r0, (int)drivers::DriverCommand::TERMINAL_OUTPUT);
     SET_REGISTER(r1, (int)val);

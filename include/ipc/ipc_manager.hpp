@@ -5,7 +5,7 @@
 
 namespace edge {
 class IPCManager {
-    etl::unordered_map<etl::string<20>, uint8_t, MAX_PROCESSES> name_to_id;
+    etl::unordered_map<ProcessName, uint8_t, MAX_PROCESSES> name_to_id;
     etl::array<ProcessCallbackPtr, MAX_PROCESSES> ipc_communicators{nullptr};
 
     IPCManager() = default;

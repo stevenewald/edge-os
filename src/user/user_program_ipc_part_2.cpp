@@ -1,6 +1,6 @@
 #include "userlib/syscalls.hpp"
 
-void task1(void)
+void ipc_part2(void)
 {
     using namespace edge::userlib;
     using namespace edge::drivers;

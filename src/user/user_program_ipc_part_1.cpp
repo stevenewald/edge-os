@@ -1,6 +1,9 @@
 #include "userlib/syscalls.hpp"
+#include "nrf52833.h"
+#include "nrf_delay.h"
+#include <stdio.h>
 
-void task0(void)
+void ipc_part1(void)
 {
     using namespace edge::userlib;
 

@@ -1,8 +1,35 @@
-#include "scheduler.hpp"
+#include "scheduler/scheduler.hpp"
 
 #include "drivers/driver_commands.hpp"
 #include "nrf52833.h"
 #include "pending_process_callbacks.hpp"
+#include "util.hpp"
+
+extern "C" {
+extern uint8_t __start_user_programs_code;
+extern uint8_t __end_user_programs_code;
+extern uint8_t __start_user_programs_data;
+extern uint8_t __end_user_programs_data;
+}
+
+namespace {
+void initialize_mpu()
+{
+    MPU->CTRL = 0;
+
+    MPU->RNR = 0;
+    MPU->RBAR = ((unsigned)(&__start_user_programs_code) & MPU_RBAR_ADDR_Msk);
+    MPU->RASR = (0b111 << MPU_RASR_AP_Pos) | (13 << MPU_RASR_SIZE_Pos)
+                | (1 << MPU_RASR_ENABLE_Pos);
+
+    MPU->RNR = 1;
+    MPU->RBAR = ((unsigned)(&__start_user_programs_data) & MPU_RBAR_ADDR_Msk);
+    MPU->RASR = (0b011 << MPU_RASR_AP_Pos) | (13 << MPU_RASR_SIZE_Pos)
+                | (1 << MPU_RASR_ENABLE_Pos);
+
+    MPU->CTRL = MPU_CTRL_ENABLE_Msk | MPU_CTRL_PRIVDEFENA_Msk;
+}
+} // namespace
 
 namespace edge {
 
@@ -20,6 +47,7 @@ void Scheduler::start_scheduler()
 
     NVIC_SetPriority(PendSV_IRQn, 0x3);
     NVIC_SetPriority(SysTick_IRQn, 0x1);
+    initialize_mpu();
     asm volatile("CPSIE I");
     asm volatile("SVC #0");
 }
@@ -29,6 +57,16 @@ void Scheduler::add_task(void (*function)(void), uint8_t priority)
     task_stack.emplace_back(
         exception_stack_registers{reinterpret_cast<unsigned>(function)}, priority
     );
+}
+
+void Scheduler::update_mpu_with_stack() const
+{
+    const unsigned* current_task_stack = task_stack[current_task_index].stack.begin();
+
+    MPU->RNR = 2;
+    MPU->RBAR = (reinterpret_cast<unsigned>(current_task_stack) & MPU_RBAR_ADDR_Msk);
+    MPU->RASR = (0b011 << MPU_RASR_AP_Pos) | (10 << MPU_RASR_SIZE_Pos)
+                | (1 << MPU_RASR_ENABLE_Pos);
 }
 
 void trigger_pendsv()
@@ -82,6 +120,8 @@ __attribute__((naked, used)) void PendSV_Handler()
             scheduler.task_stack[scheduler.current_task_index].stack_ptr_loc
         ));
 
+        scheduler.update_mpu_with_stack();
+
         asm volatile("mrs r0,psp\n"
                      "sub r0,#96\n"
                      "ldm r0!,{r4-r11}\n"
@@ -106,7 +146,7 @@ __attribute__((used)) void SysTick_Handler()
 
 // Runs in userspace after async callback has finished
 // I don't think there's any way to make this cleaner lol
-__attribute__((used, naked)) void restore_regs()
+__attribute__((used, naked)) USER_CODE void restore_regs()
 {
     // Load fpscr first so we can avoid dirtying r0 after its popped
     asm volatile("ldr r0, [sp, #96]\n"

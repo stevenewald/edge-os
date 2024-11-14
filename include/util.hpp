@@ -1,5 +1,7 @@
 #pragma once
 
+#define USER_CODE __attribute__((section(".user_code")))
+
 namespace edge {
 [[noreturn]] void panic(const char* reason);
 
