@@ -2,7 +2,7 @@
 
 #include "drivers/driver_commands.hpp"
 #include "nrf52833.h"
-#include "process_callback_storage.hpp"
+#include "pending_process_callbacks.hpp"
 
 namespace edge {
 
@@ -27,7 +27,7 @@ void Scheduler::start_scheduler()
 void Scheduler::add_task(void (*function)(void), uint8_t priority)
 {
     task_stack.emplace_back(
-        stack_registers{reinterpret_cast<unsigned>(function)}, priority
+        exception_stack_registers{reinterpret_cast<unsigned>(function)}, priority
     );
 }
 
@@ -131,7 +131,7 @@ __attribute__((used, naked)) void restore_regs()
 void Scheduler::yield_current_task()
 {
     auto callback_opt =
-        ProcessCallbackStorage::get().get_ready_callback(current_task_index);
+        PendingProcessCallbacks::get().get_ready_callback(current_task_index);
     if (!callback_opt) {
         // Expire turn
         slices_remaining = 1;
@@ -144,12 +144,13 @@ void Scheduler::yield_current_task()
     // This stack frame, originally created by the exception handler, will be popped
     // by restore()
     t.stack_ptr_loc = (unsigned*)__get_PSP();
-    auto stored_registers = reinterpret_cast<stack_registers*>(t.stack_ptr_loc);
+    auto stored_registers =
+        reinterpret_cast<exception_stack_registers*>(t.stack_ptr_loc);
 
     // "Push" registers, create a fake stack frame
     // This will be popped by the exception handler
-    t.stack_ptr_loc -= (sizeof(stack_registers) / sizeof(unsigned));
-    auto new_registers = reinterpret_cast<stack_registers*>(t.stack_ptr_loc);
+    t.stack_ptr_loc -= (sizeof(exception_stack_registers) / sizeof(unsigned));
+    auto new_registers = reinterpret_cast<exception_stack_registers*>(t.stack_ptr_loc);
     new_registers->R0 = static_cast<unsigned>(arg1);
     new_registers->R1 = static_cast<unsigned>(arg2);
 

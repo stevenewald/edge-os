@@ -24,6 +24,12 @@ void yield()
     TRIGGER_SVC(SystemCallType::YIELD);
 }
 
+void set_fault_handler(void (*callback)(FaultType))
+{
+    SET_REGISTER(r0, callback);
+    TRIGGER_SVC(SystemCallType::SET_FAULT_HANDLER);
+}
+
 void send_ipc(const ProcessName& name, uint32_t message)
 {
     SET_REGISTER(r0, IPCCommandType::SEND);

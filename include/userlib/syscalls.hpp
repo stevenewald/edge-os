@@ -24,6 +24,8 @@ void send_ipc(const ProcessName& name, uint32_t message);
 
 void subscribe_ipc(const ProcessName& name, void (*callback)(int message));
 
+void set_fault_handler(void (*callback)(FaultType));
+
 // We need a syscall for this because SVC will not be preempted by SysTick
 // Technically this is insecure - it's mostly for debugging
 void debug_print(const char* string);

@@ -9,7 +9,7 @@ namespace edge {
 // This doesn't matter rn but would matter if we were worried about shutdown and wanted
 // very predictable dtor calls
 // TLDR: singleton vs everything owned by scheduler, food for thought
-class ProcessCallbackStorage {
+class PendingProcessCallbacks {
 public:
     static constexpr uint8_t MAX_READY_CALLBACKS = 10;
 
@@ -18,14 +18,14 @@ private:
         etl::vector<drivers::subscribe_callback, MAX_READY_CALLBACKS>, MAX_PROCESSES>
         ready_callbacks;
 
-    ProcessCallbackStorage() = default;
-    ~ProcessCallbackStorage() = default;
+    PendingProcessCallbacks() = default;
+    ~PendingProcessCallbacks() = default;
 
 public:
-    ProcessCallbackStorage(const ProcessCallbackStorage&) = delete;
-    ProcessCallbackStorage(ProcessCallbackStorage&&) = delete;
-    ProcessCallbackStorage& operator=(const ProcessCallbackStorage&) = delete;
-    ProcessCallbackStorage& operator=(ProcessCallbackStorage&&) = delete;
+    PendingProcessCallbacks(const PendingProcessCallbacks&) = delete;
+    PendingProcessCallbacks(PendingProcessCallbacks&&) = delete;
+    PendingProcessCallbacks& operator=(const PendingProcessCallbacks&) = delete;
+    PendingProcessCallbacks& operator=(PendingProcessCallbacks&&) = delete;
 
     void add_ready_callback(
         uint8_t process_id, ProcessCallbackPtr callback, int arg1 = 0, int arg2 = 0
@@ -33,6 +33,6 @@ public:
 
     etl::optional<drivers::subscribe_callback> get_ready_callback(uint8_t process_id);
 
-    static ProcessCallbackStorage& get();
+    static PendingProcessCallbacks& get();
 };
 } // namespace edge

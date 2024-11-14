@@ -1,16 +1,16 @@
-#include "process_callback_storage.hpp"
+#include "pending_process_callbacks.hpp"
 
 #include <stdio.h>
 
 namespace edge {
 
-ProcessCallbackStorage& ProcessCallbackStorage::get()
+PendingProcessCallbacks& PendingProcessCallbacks::get()
 {
-    static ProcessCallbackStorage process_callback_storage;
-    return process_callback_storage;
+    static PendingProcessCallbacks pending_process_callbacks;
+    return pending_process_callbacks;
 }
 
-void ProcessCallbackStorage::add_ready_callback(
+void PendingProcessCallbacks::add_ready_callback(
     uint8_t process_id, ProcessCallbackPtr callback, int arg1, int arg2
 )
 {
@@ -22,7 +22,7 @@ void ProcessCallbackStorage::add_ready_callback(
 }
 
 etl::optional<drivers::subscribe_callback>
-ProcessCallbackStorage::get_ready_callback(uint8_t process_id)
+PendingProcessCallbacks::get_ready_callback(uint8_t process_id)
 {
     if (ready_callbacks[process_id].empty()) {
         return etl::nullopt;
