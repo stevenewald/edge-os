@@ -2,11 +2,14 @@
 
 #include "drivers/driver_enums.hpp"
 #include "ipc/ipc_command_types.hpp"
-#include "register_utils.hpp"
 #include "userlib/system_call_type.hpp"
 #include "util.hpp"
 
 #include <stdio.h>
+
+#define TRIGGER_SVC(call_type)   asm volatile("svc %0" ::"I"(call_type))
+#define SET_REGISTER(reg, value) asm volatile("mov " #reg ", %0" ::"r"(value) : #reg)
+#define READ_REGISTER(reg, var)  asm volatile("mov %0, " #reg : "=r"(var))
 
 #define RETURN_REGISTER(reg)                                                           \
     int ret;                                                                           \

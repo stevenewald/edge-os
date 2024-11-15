@@ -1,4 +1,4 @@
-#include "fault_handler.hpp"
+#include "faults/fault_handler.hpp"
 #include "nrf52833.h"
 
 #include <stdio.h>

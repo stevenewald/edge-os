@@ -2,7 +2,7 @@
 
 #include "drivers/driver_commands.hpp"
 #include "nrf52833.h"
-#include "pending_process_callbacks.hpp"
+#include "scheduler/pending_process_callbacks.hpp"
 #include "scheduler/mpu.hpp"
 #include "util.hpp"
 
