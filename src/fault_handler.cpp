@@ -2,7 +2,7 @@
 
 #include "nrf52.h"
 #include "pending_process_callbacks.hpp"
-#include "scheduler.hpp"
+#include "scheduler/scheduler.hpp"
 
 #include <stdio.h>
 

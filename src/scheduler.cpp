@@ -1,8 +1,10 @@
-#include "scheduler.hpp"
+#include "scheduler/scheduler.hpp"
 
 #include "drivers/driver_commands.hpp"
 #include "nrf52833.h"
 #include "pending_process_callbacks.hpp"
+#include "scheduler/mpu.hpp"
+#include "util.hpp"
 
 namespace edge {
 
@@ -20,6 +22,7 @@ void Scheduler::start_scheduler()
 
     NVIC_SetPriority(PendSV_IRQn, 0x3);
     NVIC_SetPriority(SysTick_IRQn, 0x1);
+    MpuController::get().initialize_mpu();
     asm volatile("CPSIE I");
     asm volatile("SVC #0");
 }
@@ -82,6 +85,10 @@ __attribute__((naked, used)) void PendSV_Handler()
             scheduler.task_stack[scheduler.current_task_index].stack_ptr_loc
         ));
 
+        const unsigned* stack_start =
+            scheduler.task_stack[scheduler.current_task_index].stack.begin();
+        MpuController::get().set_program_stack_start(stack_start);
+
         asm volatile("mrs r0,psp\n"
                      "sub r0,#96\n"
                      "ldm r0!,{r4-r11}\n"
@@ -106,7 +113,7 @@ __attribute__((used)) void SysTick_Handler()
 
 // Runs in userspace after async callback has finished
 // I don't think there's any way to make this cleaner lol
-__attribute__((used, naked)) void restore_regs()
+__attribute__((used, naked)) USER_CODE void restore_regs()
 {
     // Load fpscr first so we can avoid dirtying r0 after its popped
     asm volatile("ldr r0, [sp, #96]\n"

@@ -18,13 +18,16 @@ ETL_INCLUDES += ./external/etl/include/etl/unordered_map.h
 # Source and header files
 APP_HEADER_PATHS += ./include
 APP_SOURCE_PATHS += ./src
-APP_SOURCES = $(notdir $(wildcard src/*.cpp))
+APP_SOURCE_PATHS += ./src/user
+APP_SOURCES = $(notdir $(wildcard src/*.cpp src/user/*.cpp))
 
 # Path to base of nRF52x-base repo
 NRF_BASE_DIR = external/nrf52x-base/
 
 # Include board Makefile (if any)
 include external/microbit_v2/Board.mk
+
+LINKER_SCRIPT = edge_os.ld
 
 # Include main Makefile
 include $(NRF_BASE_DIR)/make/AppMakefile.mk
