@@ -1,9 +1,7 @@
-#include "userlib/syscalls.hpp"
-#include "nrf52833.h"
-#include "nrf_delay.h"
+#include "../include/userlib/syscalls.hpp"
 #include <stdio.h>
 
-void ipc_part1(void)
+int ipc_part1(void)
 {
     using namespace edge::userlib;
 
@@ -24,5 +22,6 @@ void ipc_part1(void)
             set_led(0, 4, false);
         }
     }
+	return 0;
 }
 

@@ -1,5 +1,6 @@
 #pragma once
 
+using ProcessName = etl::string<20>;
 #include "config.hpp"
 #include "util.hpp"
 

@@ -26,6 +26,7 @@ APP_SOURCE_PATHS += ./src/ipc
 APP_SOURCE_PATHS += ./src/scheduler
 APP_SOURCE_PATHS += ./src/userlib
 APP_SOURCE_PATHS += ./src/svc
+APP_SOURCE_PATHS += ./programs
 
 # I hate make
 rwildcard = $(foreach d,$(wildcard $1*), \
