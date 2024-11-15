@@ -1,7 +1,8 @@
 #pragma once
 
+#include "config.hpp"
+
 namespace edge {
-static constexpr size_t STACK_SIZE_BYTES = 2048;
 
 class Task {
     static constexpr size_t STACK_SIZE_IN_UNSIGNED =
@@ -10,7 +11,7 @@ class Task {
 
 public:
     // ===== DO NOT REARRANGE THESE =====
-	// Align for MPU purposes
+    // Align for MPU purposes
     alignas(STACK_SIZE_BYTES) etl::array<unsigned, STACK_SIZE_IN_UNSIGNED> stack{};
     exception_stack_registers first_stack_frame;
     // ==================================

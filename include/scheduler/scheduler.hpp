@@ -33,7 +33,6 @@ public:
     void yield_current_task();
 
 private:
-    void update_mpu_with_stack() const;
     void handle_first_svc_hit();
 
     friend void PendSV_Handler(void);
