@@ -1,6 +1,6 @@
 #include "drivers/driver_commands.hpp"
 #include "drivers/driver_enums.hpp"
-#include "fault_handler.hpp"
+#include "faults/fault_handler.hpp"
 #include "ipc/ipc_command_types.hpp"
 #include "ipc/ipc_manager.hpp"
 #include "scheduler/scheduler.hpp"

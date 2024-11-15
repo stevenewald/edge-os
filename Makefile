@@ -17,9 +17,21 @@ ETL_INCLUDES += ./external/etl/include/etl/unordered_map.h
 
 # Source and header files
 APP_HEADER_PATHS += ./include
-APP_SOURCE_PATHS += ./src
-APP_SOURCE_PATHS += ./src/user
-APP_SOURCES = $(notdir $(wildcard src/*.cpp src/user/*.cpp))
+APP_SOURCE_PATHS = ./src
+APP_SOURCE_PATHS += ./src/user_programs
+APP_SOURCE_PATHS += ./src/drivers
+APP_SOURCE_PATHS += ./src/faults
+APP_SOURCE_PATHS += ./src/hal
+APP_SOURCE_PATHS += ./src/ipc
+APP_SOURCE_PATHS += ./src/scheduler
+APP_SOURCE_PATHS += ./src/userlib
+APP_SOURCE_PATHS += ./src/svc
+
+# I hate make
+rwildcard = $(foreach d,$(wildcard $1*), \
+                $(call rwildcard,$d/,$2)) $(wildcard $1$2)
+
+APP_SOURCES = $(foreach dir,$(APP_SOURCE_PATHS),$(call rwildcard,$(dir)/,*.cpp))
 
 # Path to base of nRF52x-base repo
 NRF_BASE_DIR = external/nrf52x-base/

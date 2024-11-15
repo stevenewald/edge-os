@@ -1,6 +1,6 @@
 #include "ipc/ipc_manager.hpp"
 
-#include "pending_process_callbacks.hpp"
+#include "scheduler/pending_process_callbacks.hpp"
 #include "util.hpp"
 
 #include <stdio.h>

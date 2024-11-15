@@ -1,5 +1,5 @@
 #include "drivers/driver_enums.hpp"
-#include "fault_handler.hpp"
+#include "faults/fault_handler.hpp"
 #include "scheduler/scheduler.hpp"
 #include "util.hpp"
 
