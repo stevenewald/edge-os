@@ -30,6 +30,8 @@ etl::optional<int> handle_command(DriverCommand type, int arg1, int arg2, int ar
             return ButtonController::get().get_button_pressed(
                 static_cast<ButtonType>(arg1)
             );
+        case DriverCommand::CAPTOUCH:
+            break;
     }
     return etl::nullopt;
 }

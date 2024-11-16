@@ -7,7 +7,8 @@ enum class DriverCommand {
     GET_TIME = 0,
     LED_DISPLAY = 1,
     BUTTONS = 2,
-    TERMINAL_OUTPUT = 3
+    TERMINAL_OUTPUT = 3,
+    CAPTOUCH = 4,
 };
 
 enum class DriverSubscribe { NOTIFY_BUTTON_PRESS = 0 };
