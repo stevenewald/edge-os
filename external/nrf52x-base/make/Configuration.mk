@@ -269,6 +269,9 @@ override CXXFLAGS += \
 	-DETL_NO_STL \
     -Wall \
     -Wextra \
+	-fno-exceptions \
+	-fno-unwind-tables \
+	-fno-asynchronous-unwind-tables \
     -Wno-date-time \
     -Wno-unused-parameter \
     -Werror=return-type \

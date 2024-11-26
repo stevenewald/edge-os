@@ -1,8 +1,24 @@
 #include "drivers/driver_enums.hpp"
 #include "drivers/driver_enums.hpp"
 #include "drivers/capsense_driver.hpp"
+#include "drivers/gpio_pin_event.hpp"
+#include "hal/gpio_wrapper.hpp"
+#include "hal/hal_enums.hpp"
+#include "microbit_v2.h"
+#include "userlib/syscalls.hpp"
 
 namespace edge::drivers {
+
+CapsenseController::CapsenseController() : 
+    touched(false),
+    event{
+        TOUCH_LOGO, GPIOConfiguration::IN_NORES,
+        aidan::GPIOEventController::GPIOEventCallback::create<
+            CapsenseController, &CapsenseController::handle_gpio_interrupt>(*this)
+    }
+    {
+        aidan::clear_gpio_pin(TOUCH_LOGO);
+    };
 
 CapsenseController& CapsenseController::get()
 {
@@ -21,13 +37,9 @@ bool CapsenseController::get_captouch_pressed()
     return touched;
 }
 
-void CapsenseController::handle_gpio_interrupt(nrf_gpio_pin_sense_t sense)
+void CapsenseController::handle_gpio_interrupt(nrf_gpio_pin_sense_t sense, int pin)
 {
-    touched = true;
-}
-
-void CapsenseController::handle_timer_interrupt(nrf_timer_event_t event, void* context)
-{
+    printf("interrupt?");
     touched = false;
 }
 

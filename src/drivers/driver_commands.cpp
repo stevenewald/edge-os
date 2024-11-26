@@ -1,6 +1,7 @@
 #include "drivers/driver_commands.hpp"
 
 #include "drivers/button_driver.hpp"
+#include "drivers/capsense_driver.hpp"
 #include "drivers/driver_enums.hpp"
 #include "drivers/led_display.hpp"
 #include "drivers/timer.hpp"
@@ -31,7 +32,7 @@ etl::optional<int> handle_command(DriverCommand type, int arg1, int arg2, int ar
                 static_cast<ButtonType>(arg1)
             );
         case DriverCommand::CAPTOUCH:
-            break;
+            return CapsenseController::get().get_captouch_pressed();
     }
     return etl::nullopt;
 }
