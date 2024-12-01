@@ -1,5 +1,8 @@
+#pragma once
+
 #include <stdint.h>
 #include "nrf_twi_mngr.h"
+#include "nrf_delay.h"
 
 namespace edge::aidan {
 

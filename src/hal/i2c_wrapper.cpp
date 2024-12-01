@@ -1,5 +1,4 @@
 #include "hal/i2c_wrapper.hpp"
-#include "cmsis_gcc.h"
 #include "nrf_error.h"
 #include "nrf_twi_mngr.h"
 #include "sdk_errors.h"
@@ -37,7 +36,7 @@ void i2c_reg_write(uint8_t i2c_addr, uint8_t reg_addr, uint8_t data)
     }
 }
 
-void lsm303agr_init(const int *i2c)
+void lsm303agr_init(const nrf_twi_mngr_t *i2c)
 {
     i2c_manager = i2c;
 
@@ -52,10 +51,6 @@ void lsm303agr_init(const int *i2c)
     // Enable x, y and z axes
     i2c_reg_write(LSM303AGR_ACC_ADDRESS, CTRL_REG1_A, 0x57);
 
-    // Read WHO AM I register
-    // Always returns the same value if working
-    uint8_t res1 = i2c_reg_read(LSM303AGR_ACC_ADDRESS, WHO_AM_I_A);
-
     // ---Initialize Magnetometer---
 
     // Reboot magnetometer
@@ -69,11 +64,8 @@ void lsm303agr_init(const int *i2c)
     // Configure magnetometer at 100Hz, continuous mode
     i2c_reg_write(LSM303AGR_MAG_ADDRESS, CFG_REG_A_M, 0x0C);
 
-    // Read WHO AM I register
-    uint8_t res2 = i2c_reg_read(LSM303AGR_MAG_ADDRESS, WHO_AM_I_M);
-
     i2c_reg_write(LSM303AGR_ACC_ADDRESS, TEMP_CFG_REG_A, 0xC0);
 }
 
 
-}
+} // namespace edge::aidan
