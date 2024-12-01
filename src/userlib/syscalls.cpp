@@ -91,4 +91,11 @@ void USER_CODE debug_print(const char* val)
     SET_REGISTER(r1, (int)val);
     TRIGGER_SVC(SystemCallType::COMMAND);
 }
+
+float USER_CODE get_temperature()
+{
+    SET_REGISTER(r0, (int)drivers::DriverCommand::TEMP);
+    TRIGGER_SVC(SystemCallType::COMMAND);
+    RETURN_REGISTER(r0);
+}
 } // namespace edge::userlib

@@ -15,6 +15,8 @@ int get_time_us();
 
 bool get_button_pressed(drivers::ButtonType button_type);
 
+float get_temperature();
+
 void get_button_pressed(
     drivers::ButtonType button_type,
     void (*callback)(drivers::ButtonType, drivers::ButtonState)

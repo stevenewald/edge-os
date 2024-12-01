@@ -4,6 +4,7 @@
 #include "drivers/driver_enums.hpp"
 #include "drivers/led_display.hpp"
 #include "drivers/timer.hpp"
+#include "drivers/temp_driver.hpp"
 
 #include <stdio.h>
 
@@ -30,6 +31,8 @@ etl::optional<int> handle_command(DriverCommand type, int arg1, int arg2, int ar
             return ButtonController::get().get_button_pressed(
                 static_cast<ButtonType>(arg1)
             );
+        case DriverCommand::TEMP:
+            return read_temperature();
     }
     return etl::nullopt;
 }
