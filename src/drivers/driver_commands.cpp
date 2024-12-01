@@ -32,7 +32,7 @@ etl::optional<int> handle_command(DriverCommand type, int arg1, int arg2, int ar
                 static_cast<ButtonType>(arg1)
             );
         case DriverCommand::TEMP:
-            return read_temperature();
+            return static_cast<int>(read_temperature());
     }
     return etl::nullopt;
 }
