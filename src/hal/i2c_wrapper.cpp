@@ -5,7 +5,9 @@
 
 namespace edge::aidan {
 
-static const nrf_twi_mngr_t* i2c_manager = NULL;
+
+NRF_TWI_MNGR_DEF(twi_mngr, 1, 0);
+static const nrf_twi_mngr_t* i2c_manager = &twi_mngr;
 
 uint8_t i2c_reg_read(uint8_t i2c_addr, uint8_t reg_addr)
 {
@@ -36,10 +38,8 @@ void i2c_reg_write(uint8_t i2c_addr, uint8_t reg_addr, uint8_t data)
     }
 }
 
-void lsm303agr_init(const nrf_twi_mngr_t *i2c)
+void lsm303agr_init()
 {
-    i2c_manager = i2c;
-
     i2c_reg_write(LSM303AGR_ACC_ADDRESS, CTRL_REG5_A, 0x80);
     nrf_delay_ms(100); // needs delay to wait for reboot
 

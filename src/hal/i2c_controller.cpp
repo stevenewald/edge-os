@@ -1,0 +1,33 @@
+#include "hal/i2c_controller.hpp"
+#include "hal/i2c_wrapper.hpp"
+#include "nrf_drv_twi.h"
+#include "microbit_v2.h"
+#include "nrf_twi.h"
+#include "nrf_twi_mngr.h"
+
+namespace edge::aidan
+{
+NRF_TWI_MNGR_DEF(twi_mngr, 1, 0);
+
+I2CController& I2CController::get()
+{
+    static I2CController controller;
+    return controller;
+}
+
+I2CController::I2CController()
+{
+    nrf_drv_twi_config_t i2c_config = NRF_DRV_TWI_DEFAULT_CONFIG;
+    i2c_config.scl = I2C_INTERNAL_SCL;
+    i2c_config.sda = I2C_INTERNAL_SDA;
+    i2c_config.frequency = NRF_DRV_TWI_FREQ_100K;
+    i2c_config.interrupt_priority = 0;
+    nrf_twi_mngr_init(&twi_mngr, &i2c_config);
+    lsm303agr_init(&twi_mngr);
+}
+
+
+
+
+
+} // namespace edge::aidan
