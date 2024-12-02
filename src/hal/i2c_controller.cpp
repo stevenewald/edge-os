@@ -7,7 +7,9 @@
 
 namespace edge::aidan
 {
-NRF_TWI_MNGR_DEF(twi_mngr, 1, 0);
+static constexpr int QUEUE_SIZE = 1;
+
+NRF_TWI_MNGR_DEF(twi_mngr, QUEUE_SIZE, 0);
 
 I2CController& I2CController::get()
 {
@@ -25,9 +27,5 @@ I2CController::I2CController()
     nrf_twi_mngr_init(&twi_mngr, &i2c_config);
     lsm303agr_init(&twi_mngr);
 }
-
-
-
-
 
 } // namespace edge::aidan
