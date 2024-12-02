@@ -27,7 +27,6 @@ void USER_CODE yield()
 {
     TRIGGER_SVC(SystemCallType::YIELD);
 }
-
 void USER_CODE set_fault_handler(void (*callback)(FaultType))
 {
     SET_REGISTER(r0, callback);
@@ -84,6 +83,14 @@ int USER_CODE get_time_us()
     TRIGGER_SVC(SystemCallType::COMMAND);
     RETURN_REGISTER(r0);
 }
+
+void USER_CODE start_vtimer(void(*callback)())
+{
+    SET_REGISTER(r0, (int)drivers::DriverCommand::TIMER_INIT);
+    SET_REGISTER(r1, (int)callback);
+    TRIGGER_SVC(SystemCallType::COMMAND);
+}
+
 
 void USER_CODE debug_print(const char* val)
 {
