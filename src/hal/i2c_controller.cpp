@@ -1,12 +1,12 @@
 #include "hal/i2c_controller.hpp"
+
 #include "hal/i2c_wrapper.hpp"
-#include "nrf_drv_twi.h"
 #include "microbit_v2.h"
+#include "nrf_drv_twi.h"
 #include "nrf_twi.h"
 #include "nrf_twi_mngr.h"
 
-namespace edge::aidan
-{
+namespace edge::aidan {
 static constexpr int QUEUE_SIZE = 1;
 
 NRF_TWI_MNGR_DEF(twi_mngr, QUEUE_SIZE, 0);

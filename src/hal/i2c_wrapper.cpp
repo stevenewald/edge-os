@@ -1,10 +1,10 @@
 #include "hal/i2c_wrapper.hpp"
+
 #include "nrf_error.h"
 #include "nrf_twi_mngr.h"
 #include "sdk_errors.h"
 
 namespace edge::aidan {
-
 
 NRF_TWI_MNGR_DEF(twi_mngr, 1, 0);
 static const nrf_twi_mngr_t* i2c_manager = &twi_mngr;
@@ -17,8 +17,7 @@ uint8_t i2c_reg_read(uint8_t i2c_addr, uint8_t reg_addr)
         NRF_TWI_MNGR_READ(i2c_addr, &rx_buf, 1, NRF_TWI_MNGR_NO_STOP)
     };
     ret_code_t result = nrf_twi_mngr_perform(i2c_manager, NULL, read_transfer, 2, NULL);
-    if (result != NRF_SUCCESS)
-    {
+    if (result != NRF_SUCCESS) {
         printf("I2C TRANSACTION FAILED!");
     }
     return rx_buf;
@@ -31,9 +30,9 @@ void i2c_reg_write(uint8_t i2c_addr, uint8_t reg_addr, uint8_t data)
     nrf_twi_mngr_transfer_t const write_transfer[] = {
         NRF_TWI_MNGR_WRITE(i2c_addr, &rx_buf, 2, NRF_TWI_MNGR_NO_STOP),
     };
-    ret_code_t result = nrf_twi_mngr_perform(i2c_manager, NULL, write_transfer, 1, NULL);
-    if (result != NRF_SUCCESS) 
-    {
+    ret_code_t result =
+        nrf_twi_mngr_perform(i2c_manager, NULL, write_transfer, 1, NULL);
+    if (result != NRF_SUCCESS) {
         printf("I2C transaction failed! Error: %lX\n", result);
     }
 }
@@ -66,6 +65,5 @@ void lsm303agr_init()
 
     i2c_reg_write(LSM303AGR_ACC_ADDRESS, TEMP_CFG_REG_A, 0xC0);
 }
-
 
 } // namespace edge::aidan

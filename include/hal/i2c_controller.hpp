@@ -1,13 +1,12 @@
 #pragma once
 
-namespace edge::aidan
-{
+namespace edge::aidan {
 
-class I2CController 
-{
+class I2CController {
 public:
     ~I2CController() = default;
     static I2CController& get();
+
 private:
     I2CController();
 };
