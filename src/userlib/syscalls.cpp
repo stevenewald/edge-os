@@ -85,6 +85,13 @@ int USER_CODE get_time_us()
     RETURN_REGISTER(r0);
 }
 
+// todo delete
+void USER_CODE init_app_timer()
+{
+    SET_REGISTER(r0, (int)drivers::DriverCommand::APP_TIMER);
+    TRIGGER_SVC(SystemCallType::COMMAND);
+}
+
 void USER_CODE debug_print(const char* val)
 {
     SET_REGISTER(r0, (int)drivers::DriverCommand::TERMINAL_OUTPUT);

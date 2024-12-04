@@ -28,6 +28,8 @@ void exception_task(void)
 
     set_fault_handler(fault_handler);
 
+    init_app_timer();
+    debug_print("APP TIMER INITIALIZED!");
     trigger_faults();
 
     set_led(2, 2, true);

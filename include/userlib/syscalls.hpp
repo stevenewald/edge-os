@@ -13,6 +13,8 @@ void set_led(uint8_t row, uint8_t col, bool enabled);
 
 int get_time_us();
 
+void init_app_timer();
+
 bool get_button_pressed(drivers::ButtonType button_type);
 
 void get_button_pressed(
