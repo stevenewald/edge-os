@@ -84,13 +84,21 @@ int USER_CODE get_time_us()
     RETURN_REGISTER(r0);
 }
 
-void USER_CODE start_vtimer(void(*callback)())
+uint32_t USER_CODE start_vtimer(void(*callback)(), uint32_t microseconds)
 {
-    SET_REGISTER(r0, (int)drivers::DriverCommand::TIMER_INIT);
+    SET_REGISTER(r0, (int)drivers::DriverCommand::TIMER_START);
     SET_REGISTER(r1, (int)callback);
+    SET_REGISTER(r2, (int)microseconds);
     TRIGGER_SVC(SystemCallType::COMMAND);
+    RETURN_REGISTER(r0);
 }
 
+void USER_CODE cancel_vtimer(uint32_t timer_id)
+{
+    SET_REGISTER(r0, (int)drivers::DriverCommand::TIMER_CANCEL);
+    SET_REGISTER(r1, (int) timer_id);
+    TRIGGER_SVC(SystemCallType::COMMAND);
+}
 
 void USER_CODE debug_print(const char* val)
 {

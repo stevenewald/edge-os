@@ -31,11 +31,11 @@ etl::optional<int> handle_command(DriverCommand type, int arg1, int arg2, int ar
             return ButtonController::get().get_button_pressed(
                 static_cast<ButtonType>(arg1)
             );
-        case DriverCommand::TIMER_INIT:
-        {
-            auto vtc = VirtualTimerController::get();
-            vtc.virtual_timer_start(10000, (void*) arg1);
-        }
+        case DriverCommand::TIMER_START:
+            return VirtualTimerController::get().virtual_timer_start(static_cast<uint32_t>(arg2), (void*) arg1);
+        case DriverCommand::TIMER_CANCEL:
+            VirtualTimerController::get().virtual_timer_cancel(static_cast<uint32_t>(arg1));
+            break;
     }
     return etl::nullopt;
 }

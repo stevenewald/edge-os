@@ -9,11 +9,9 @@ namespace edge::drivers
 extern "C" {
 void TIMER3_IRQHandler(void)
 {
-    auto vtc = VirtualTimerController::get();
+    VirtualTimerController vtc = VirtualTimerController::get();
     vtc.TIMER->EVENTS_COMPARE[2] = 0;
-    printf("Starting interrupt\n");
     vtc.update_ll();
-    printf("Interrupt end!\n");
     return;
 }
 }
@@ -39,25 +37,20 @@ void VirtualTimerController::update_ll()
     }
     uint32_t val = ptr->timer_value;
     uint32_t current_time = read_timer();
-    if (val < current_time)
+    while (val < current_time)
     {
-        printf("Adding ready callback.\n");
+        list_remove_first();
         PendingProcessCallbacks::get().add_ready_callback(0, reinterpret_cast<void(*)(int, int)>(ptr->callback));
+        free(ptr);
+
+        ptr = list_get_first();
+        if (!ptr)
+        {
+            break;
+        }
+        val = ptr->timer_value;
+        current_time = read_timer();
     }
-    /* while (val < current_time) */
-    /* { */
-    /*     list_remove_first(); */
-    /*     ptr->callback(); */
-    /*     free(ptr); */
-    /**/
-    /*     ptr = list_get_first(); */
-    /*     if (!ptr) */
-    /*     { */
-    /*         break; */
-    /*     } */
-    /*     val = ptr->timer_value; */
-    /*     current_time = read_timer(); */
-    /* } */
     __enable_irq();
     return;
 }
@@ -81,13 +74,18 @@ uint32_t VirtualTimerController::timer_start(uint32_t microseconds, void* cb)
     uint32_t curr_time = read_timer();
     uint32_t time = curr_time + microseconds;
     node_ptr->timer_value = time;
+
     node_ptr->callback = cb;
+
     uint32_t node_id = (uint32_t) node_ptr;
     node_ptr->id = node_id;
+
     node_ptr->freq = microseconds;
     list_insert_sorted(node_ptr);
     update_ll();
+
     TIMER->CC[2] = list_get_first()->timer_value;
+
     __enable_irq();
     return node_id;
 }
