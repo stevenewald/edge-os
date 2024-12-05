@@ -5,19 +5,15 @@
 namespace edge::drivers {
 
 typedef struct node_t {
-
     uint32_t id;
     uint32_t freq;
 
     void* callback;
-    
 
     uint32_t timer_value;
     struct node_t* next;
 
-
 } node_t;
-
 
 void list_insert_sorted(node_t* node);
 

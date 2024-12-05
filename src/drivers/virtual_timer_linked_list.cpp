@@ -1,29 +1,23 @@
 #include "drivers/virtual_timer_linked_list.hpp"
 
-namespace edge::drivers
-{
+namespace edge::drivers {
 static node_t* linked_list = nullptr;
 
-void list_insert_sorted(node_t *node)
+void list_insert_sorted(node_t* node)
 {
     if (linked_list == nullptr) {
         node->next = nullptr;
         linked_list = node;
     }
-    else
-    {
-        if (node->timer_value < linked_list->timer_value)
-        {
+    else {
+        if (node->timer_value < linked_list->timer_value) {
             node->next = linked_list;
             linked_list = node;
         }
-        else
-        {
+        else {
             node_t* prev_node = linked_list;
             node_t* curr_node = linked_list->next;
-            while (curr_node != nullptr && curr_node->timer_value < node->timer_value)
-            {
-
+            while (curr_node != nullptr && curr_node->timer_value < node->timer_value) {
                 prev_node = curr_node;
                 curr_node = curr_node->next;
             }
@@ -41,8 +35,7 @@ node_t* list_get_first()
 node_t* list_remove_first()
 {
     node_t* head = linked_list;
-    if (head != nullptr)
-    {
+    if (head != nullptr) {
         linked_list = head->next;
     }
     return head;
@@ -50,23 +43,18 @@ node_t* list_remove_first()
 
 void list_remove(node_t* node)
 {
-    if (linked_list != nullptr)
-    {
-        if (linked_list == node)
-        {   
+    if (linked_list != nullptr) {
+        if (linked_list == node) {
             linked_list = linked_list->next;
         }
-        else
-        {
+        else {
             node_t* prev_node = linked_list;
             node_t* curr_node = linked_list->next;
-            while (curr_node != nullptr && curr_node != node)
-            {
+            while (curr_node != nullptr && curr_node != node) {
                 prev_node = curr_node;
                 curr_node = curr_node->next;
             }
-            if (curr_node != nullptr)
-            {
+            if (curr_node != nullptr) {
                 prev_node->next = curr_node->next;
             }
         }

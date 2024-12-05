@@ -1,8 +1,8 @@
 #pragma once
 
 #include "drivers/driver_enums.hpp"
-#include "util.hpp"
 #include "stdint.h"
+#include "util.hpp"
 
 namespace edge::userlib {
 
