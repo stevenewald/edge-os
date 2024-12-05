@@ -21,13 +21,13 @@ uint32_t increment_pc(uint32_t program_counter)
 FaultHandler::FaultHandler()
 {
     // Enable UsageFault
-    SCB->SHCSR |= SCB_SHCSR_USGFAULTENA_Msk;
-
-    // Enable BusFault
-    SCB->SHCSR |= SCB_SHCSR_BUSFAULTENA_Msk;
-
-    // Enable MemoryFault
-    SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk;
+    // SCB->SHCSR |= SCB_SHCSR_USGFAULTENA_Msk;
+    //
+    // // Enable BusFault
+    // SCB->SHCSR |= SCB_SHCSR_BUSFAULTENA_Msk;
+    //
+    // // Enable MemoryFault
+    // SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk;
 }
 
 FaultHandler::~FaultHandler()

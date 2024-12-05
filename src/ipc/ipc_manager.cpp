@@ -33,7 +33,7 @@ void IPCManager::send_message(const ProcessName& destination_name, int value)
 
     auto process_id = name_to_id[destination_name];
     auto callback = ipc_communicators[process_id];
-    PendingProcessCallbacks::get().add_ready_callback(process_id, callback, value);
+    // PendingProcessCallbacks::get().add_ready_callback(process_id, callback, value);
     return;
 }
 } // namespace edge

@@ -86,10 +86,11 @@ int USER_CODE get_time_us()
 }
 
 // todo delete
-void USER_CODE init_app_timer()
+void USER_CODE init_app_timer(void (*callback)())
 {
-    SET_REGISTER(r0, (int)drivers::DriverCommand::APP_TIMER);
-    TRIGGER_SVC(SystemCallType::COMMAND);
+    SET_REGISTER(r0, (int)drivers::DriverSubscribe::APP_TIMER);
+    SET_REGISTER(r1, (int)callback);
+    TRIGGER_SVC(SystemCallType::SUBSCRIBE);
 }
 
 void USER_CODE debug_print(const char* val)

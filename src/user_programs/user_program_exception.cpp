@@ -4,11 +4,11 @@ void exception_task(void)
 {
     auto trigger_faults = []() {
         // Usage
-        asm volatile(".word 0xFFFFFFFF");
-
-        // Memory
-        volatile uint32_t* invalid_address = (uint32_t*)0xFFFFFFF0;
-        [[maybe_unused]] uint32_t value = *invalid_address;
+        // asm volatile(".word 0xFFFFFFFF");
+        //
+        // // Memory
+        // volatile uint32_t* invalid_address = (uint32_t*)0xFFFFFFF0;
+        // [[maybe_unused]] uint32_t value = *invalid_address;
     };
 
     using namespace edge::userlib;
@@ -26,9 +26,13 @@ void exception_task(void)
         }
     };
 
+	static void (*foreskin)() = []() {
+		set_led(2,3,true);
+	};
+
     set_fault_handler(fault_handler);
 
-    init_app_timer();
+    init_app_timer(foreskin);
     debug_print("APP TIMER INITIALIZED!");
     trigger_faults();
 

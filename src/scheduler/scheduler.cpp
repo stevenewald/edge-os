@@ -20,9 +20,10 @@ void Scheduler::start_scheduler()
     SysTick->CTRL =
         SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
 
-    NVIC_SetPriority(PendSV_IRQn, 0x3);
-    NVIC_SetPriority(SysTick_IRQn, 0x1);
-    MpuController::get().initialize_mpu();
+    NVIC_SetPriority(PendSV_IRQn, 0x4);
+    NVIC_SetPriority(SysTick_IRQn, 0x3);
+    NVIC_SetPriority(SWI0_EGU0_IRQn, 0x1);
+    // MpuController::get().initialize_mpu();
     asm volatile("CPSIE I");
     asm volatile("SVC #0");
 }

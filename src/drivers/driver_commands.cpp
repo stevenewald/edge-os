@@ -31,11 +31,6 @@ etl::optional<int> handle_command(DriverCommand type, int arg1, int arg2, int ar
             return ButtonController::get().get_button_pressed(
                 static_cast<ButtonType>(arg1)
             );
-        case DriverCommand::APP_TIMER:
-            {
-                AppTimerController::get();
-                break;
-            }
     }
     return etl::nullopt;
 }
@@ -51,6 +46,9 @@ void handle_subscribe(
                 static_cast<ButtonType>(arg1), callback, process_id
             );
             break;
+		case DriverSubscribe::APP_TIMER:
+			AppTimerController::get().subscribe(callback);
+			break;
     }
 }
 

@@ -9,7 +9,12 @@ class AppTimerController
 public:
     static AppTimerController& get();
 
-private:
+// private:
+
+	void (*callback_)(int,int);
+	app_timer_id_t penis;
+	void subscribe(void (*callback)(int,int));
+	static void fuckit();
 
     AppTimerController();
 
