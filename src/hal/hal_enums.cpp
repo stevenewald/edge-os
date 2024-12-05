@@ -16,4 +16,16 @@ nrf_gpio_pin_pull_t to_nrf_gpio_pin_pull(PinPullMode mode)
             panic("Invalid pull mode");
     }
 }
+
+nrf_gpio_pin_sense_t to_nrf_gpio_pin_sense(PinSense sense)
+{
+    switch (sense) {
+        case PinSense::LOW:
+            return NRF_GPIO_PIN_SENSE_LOW;
+        case PinSense::HIGH:
+            return NRF_GPIO_PIN_SENSE_HIGH;
+        default:
+            panic("Invalid pin sense");
+    }
+}
 } // namespace edge::aidan
