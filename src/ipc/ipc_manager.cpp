@@ -1,6 +1,5 @@
 #include "ipc/ipc_manager.hpp"
 
-#include "scheduler/pending_process_callbacks.hpp"
 #include "util.hpp"
 
 #include <stdio.h>
@@ -16,11 +15,7 @@ void IPCManager::register_callback(
     uint8_t process_id, const ProcessName& new_process_name, ProcessCallbackPtr callback
 )
 {
-    if (ipc_communicators[process_id] != nullptr) [[unlikely]] {
-        panic("IPC registered twice for a process");
-    }
-
-    ipc_communicators[process_id] = callback;
+    ipc_communicators.set_callback(process_id, callback);
     name_to_id[new_process_name] = process_id;
 }
 
@@ -32,8 +27,6 @@ void IPCManager::send_message(const ProcessName& destination_name, int value)
     }
 
     auto process_id = name_to_id[destination_name];
-    auto callback = ipc_communicators[process_id];
-    PendingProcessCallbacks::get().add_ready_callback(process_id, callback, value);
-    return;
+    ipc_communicators.call_callback(process_id, value);
 }
 } // namespace edge

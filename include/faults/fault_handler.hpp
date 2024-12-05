@@ -1,6 +1,7 @@
 #pragma once
 
 #include "config.hpp"
+#include "scheduler/user_callback_storage.hpp"
 #include "util.hpp"
 
 namespace edge {
@@ -9,7 +10,7 @@ class FaultHandler {
     FaultHandler();
     ~FaultHandler();
 
-    etl::array<etl::optional<ProcessCallbackPtr>, MAX_PROCESSES> error_callbacks;
+    UserCallbackStorage error_callbacks;
 
 public:
     FaultHandler(const FaultHandler&) = delete;
