@@ -1,18 +1,16 @@
 #pragma once
 
-#include "stdint.h"
 #include "nrf_timer.h"
+#include "stdint.h"
 
 extern "C" {
 void TIMER3_IRQHandler(void);
 }
 
-namespace edge::drivers
-{
+namespace edge::drivers {
 
 // Reserves Timer 3
-class VirtualTimerController
-{
+class VirtualTimerController {
     static constexpr nrf_timer_frequency_t TIMER_FREQUENCY = NRF_TIMER_FREQ_16MHz;
 
 public:

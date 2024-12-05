@@ -1,12 +1,13 @@
 #include "userlib/syscalls.hpp"
-#include <cstdio>
 
+#include <cstdio>
 
 void static callback(void)
 {
     edge::userlib::set_led(3, 3, true);
     edge::userlib::debug_print("Callback!\n");
 }
+
 void exception_task(void)
 {
     auto trigger_faults = []() {
