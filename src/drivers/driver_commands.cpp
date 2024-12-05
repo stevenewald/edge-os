@@ -4,6 +4,7 @@
 #include "drivers/driver_enums.hpp"
 #include "drivers/led_display.hpp"
 #include "drivers/timer.hpp"
+#include "drivers/virtual_timer_controller.hpp"
 
 #include <stdio.h>
 
@@ -30,11 +31,16 @@ etl::optional<int> handle_command(DriverCommand type, int arg1, int arg2, int ar
             return ButtonController::get().get_button_pressed(
                 static_cast<ButtonType>(arg1)
             );
+        case DriverCommand::TIMER_CANCEL:
+            VirtualTimerController::get().virtual_timer_cancel(
+                static_cast<uint32_t>(arg1)
+            );
+            break;
     }
     return etl::nullopt;
 }
 
-void handle_subscribe(
+etl::optional<int> handle_subscribe(
     DriverSubscribe type, ProcessCallbackPtr callback, int arg1, int arg2,
     ProcessId process_id
 )
@@ -45,7 +51,12 @@ void handle_subscribe(
                 static_cast<ButtonType>(arg1), callback, process_id
             );
             break;
+        case DriverSubscribe::TIMER_START:
+            return VirtualTimerController::get().virtual_timer_start(
+                static_cast<uint32_t>(arg1), callback, process_id, arg2
+            );
     }
+    return etl::nullopt;
 }
 
 } // namespace edge::drivers

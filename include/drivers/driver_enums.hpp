@@ -7,10 +7,11 @@ enum class DriverCommand {
     GET_TIME = 0,
     LED_DISPLAY = 1,
     BUTTONS = 2,
-    TERMINAL_OUTPUT = 3
+    TERMINAL_OUTPUT = 3,
+    TIMER_CANCEL = 4,
 };
 
-enum class DriverSubscribe { NOTIFY_BUTTON_PRESS = 0 };
+enum class DriverSubscribe { NOTIFY_BUTTON_PRESS = 0, TIMER_START = 1 };
 
 enum class GPIOConfiguration { OUT, IN_NORES, IN_PDR, IN_PUR };
 

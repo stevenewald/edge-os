@@ -1,5 +1,3 @@
-#include "nrf52833.h"
-#include "nrf_delay.h"
 #include "userlib/syscalls.hpp"
 
 #include <stdio.h>

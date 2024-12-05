@@ -1,6 +1,7 @@
 #pragma once
 
 #include "drivers/driver_enums.hpp"
+#include "stdint.h"
 #include "util.hpp"
 
 namespace edge::userlib {
@@ -25,6 +26,11 @@ void send_ipc(const char* name, uint32_t message);
 void subscribe_ipc(const char* name, void (*callback)(int message));
 
 void set_fault_handler(void (*callback)(FaultType));
+
+uint32_t
+start_timer(void (*callback)(uint32_t), uint32_t microseconds, bool periodic = false);
+
+void cancel_timer(uint32_t timer_id);
 
 // We need a syscall for this because SVC will not be preempted by SysTick
 // Technically this is insecure - it's mostly for debugging

@@ -14,6 +14,7 @@ ETL_INCLUDES += ./external/etl/include/etl/string_stream.h
 ETL_INCLUDES += ./external/etl/include/etl/to_string.h
 ETL_INCLUDES += ./external/etl/include/etl/delegate.h
 ETL_INCLUDES += ./external/etl/include/etl/unordered_map.h
+ETL_INCLUDES += ./external/etl/include/etl/set.h
 
 # Source and header files
 APP_HEADER_PATHS += ./include
