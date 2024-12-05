@@ -9,7 +9,6 @@ typedef struct node_t {
     uint32_t id;
     uint32_t freq;
 
-    /* etl::delegate<void()> callback; */
     void* callback;
     
 
