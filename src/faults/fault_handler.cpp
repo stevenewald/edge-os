@@ -1,7 +1,6 @@
 #include "faults/fault_handler.hpp"
 
 #include "nrf52.h"
-#include "scheduler/pending_process_callbacks.hpp"
 #include "scheduler/scheduler.hpp"
 
 #include <stdio.h>
@@ -49,27 +48,18 @@ FaultHandler& FaultHandler::get()
 }
 
 void FaultHandler::set_fault_callback(
-    uint8_t process_id, ProcessCallbackPtr callback_ptr
+    ProcessId process_id, ProcessCallbackPtr callback_ptr
 )
 {
-    if (error_callbacks[process_id]) {
-        printf("Process %d already set callback for fault handling\n", process_id);
-        return;
-    }
-    error_callbacks[process_id] = callback_ptr;
+    error_callbacks.set_callback(process_id, callback_ptr);
 }
 
 void FaultHandler::fault_triggered(FaultType fault_type, uint32_t* stack_ptr)
 {
-    uint8_t current_task = scheduler.get_current_task();
-    if (!error_callbacks[current_task].has_value()) [[unlikely]] {
-        panic("Error handler not set");
-    }
-
     stack_ptr[6] = increment_pc(stack_ptr[6]);
-    PendingProcessCallbacks::get().add_ready_callback(
-        current_task, error_callbacks[current_task].value(),
-        static_cast<int>(fault_type)
+
+    error_callbacks.call_callback(
+        scheduler.get_current_task(), static_cast<int>(fault_type)
     );
 }
 } // namespace edge

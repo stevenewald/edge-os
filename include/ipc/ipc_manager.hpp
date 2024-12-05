@@ -1,12 +1,13 @@
 #pragma once
 
 #include "config.hpp"
+#include "scheduler/user_callback_storage.hpp"
 #include "util.hpp"
 
 namespace edge {
 class IPCManager {
     etl::unordered_map<ProcessName, uint8_t, MAX_PROCESSES> name_to_id;
-    etl::array<ProcessCallbackPtr, MAX_PROCESSES> ipc_communicators{nullptr};
+    UserCallbackStorage ipc_communicators{};
 
     IPCManager() = default;
     ~IPCManager() = default;
@@ -19,7 +20,7 @@ public:
     static IPCManager& get();
 
     void register_callback(
-        uint8_t process_id, const ProcessName& process_name, ProcessCallbackPtr callback
+        ProcessId process_id, const ProcessName& process_name, ProcessCallbackPtr callback
     );
     void send_message(const ProcessName& destination_name, int value);
 };

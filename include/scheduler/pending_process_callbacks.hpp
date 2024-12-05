@@ -28,10 +28,10 @@ public:
     PendingProcessCallbacks& operator=(PendingProcessCallbacks&&) = delete;
 
     void add_ready_callback(
-        uint8_t process_id, ProcessCallbackPtr callback, int arg1 = 0, int arg2 = 0
+        ProcessId process_id, ProcessCallbackPtr callback, int arg1 = 0, int arg2 = 0
     );
 
-    etl::optional<drivers::subscribe_callback> get_ready_callback(uint8_t process_id);
+    etl::optional<drivers::subscribe_callback> get_ready_callback(ProcessId process_id);
 
     static PendingProcessCallbacks& get();
 };
