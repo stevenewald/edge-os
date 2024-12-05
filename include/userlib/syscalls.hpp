@@ -27,9 +27,9 @@ void subscribe_ipc(const char* name, void (*callback)(int message));
 
 void set_fault_handler(void (*callback)(FaultType));
 
-uint32_t start_vtimer(void (*callback)(), uint32_t microseconds);
+uint32_t start_timer(void (*callback)(uint32_t), uint32_t microseconds);
 
-void cancel_vtimer(uint32_t timer_id);
+void cancel_timer(uint32_t timer_id);
 
 // We need a syscall for this because SVC will not be preempted by SysTick
 // Technically this is insecure - it's mostly for debugging
