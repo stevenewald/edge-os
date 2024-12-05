@@ -5,18 +5,19 @@
 void static callback(void)
 {
     edge::userlib::set_led(3, 3, true);
+    edge::userlib::debug_print("Callback!\n");
 }
 void exception_task(void)
 {
-    /* auto trigger_faults = []() { */
-    /*     // Usage */
-    /*     asm volatile(".word 0xFFFFFFFF"); */
-    /**/
-    /*     // Memory */
-    /*     volatile uint32_t* invalid_address = (uint32_t*)0xFFFFFFF0; */
-    /*     [[maybe_unused]] uint32_t value = *invalid_address; */
-    /* }; */
-    /**/
+    auto trigger_faults = []() {
+        // Usage
+        asm volatile(".word 0xFFFFFFFF");
+
+        // Memory
+        volatile uint32_t* invalid_address = (uint32_t*)0xFFFFFFF0;
+        [[maybe_unused]] uint32_t value = *invalid_address;
+    };
+
     using namespace edge::userlib;
     static void (*fault_handler)(edge::FaultType) = [](edge::FaultType type) {
         switch (type) {
@@ -34,8 +35,10 @@ void exception_task(void)
 
     set_fault_handler(fault_handler);
 
-    /* trigger_faults(); */
-    start_vtimer(&callback);
+    trigger_faults();
+    start_vtimer(&callback, 100000);
+    auto id = start_vtimer(&callback, 100000);
+    cancel_vtimer(id);
 
     set_led(2, 2, true);
 
