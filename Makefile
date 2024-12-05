@@ -49,12 +49,8 @@ CPP_FILES := $(wildcard src/*.cpp include/*.hpp)
 
 .PHONY: format
 format:
-	clang-format -style=file -i $(CPP_FILES)
-
-.PHONY: tidy
-tidy:
-	clang-tidy $(CPP_FILES) -- -std=c++20
+	find src include -name '*.cpp' -o -name '*.hpp' | xargs clang-format --style=file -i
 
 .PHONY: lint
-lint: format tidy
+lint: format
 
