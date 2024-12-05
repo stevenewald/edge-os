@@ -22,7 +22,7 @@ void Scheduler::start_scheduler()
 
     NVIC_SetPriority(PendSV_IRQn, 0x3);
     NVIC_SetPriority(SysTick_IRQn, 0x1);
-    /* MpuController::get().initialize_mpu(); */
+    MpuController::get().initialize_mpu();
     asm volatile("CPSIE I");
     asm volatile("SVC #0");
 }
