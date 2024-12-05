@@ -48,7 +48,7 @@ FaultHandler& FaultHandler::get()
 }
 
 void FaultHandler::set_fault_callback(
-    uint8_t process_id, ProcessCallbackPtr callback_ptr
+    ProcessId process_id, ProcessCallbackPtr callback_ptr
 )
 {
     error_callbacks.set_callback(process_id, callback_ptr);

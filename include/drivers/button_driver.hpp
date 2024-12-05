@@ -35,7 +35,7 @@ public:
     bool get_button_pressed(ButtonType button_type);
 
     void subscribe_button_press(
-        ButtonType type, ProcessCallbackPtr callback, uint8_t process_id
+        ButtonType type, ProcessCallbackPtr callback, ProcessId process_id
     );
 };
 } // namespace edge::drivers

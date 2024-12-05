@@ -20,7 +20,7 @@ public:
     static IPCManager& get();
 
     void register_callback(
-        uint8_t process_id, const ProcessName& process_name, ProcessCallbackPtr callback
+        ProcessId process_id, const ProcessName& process_name, ProcessCallbackPtr callback
     );
     void send_message(const ProcessName& destination_name, int value);
 };
