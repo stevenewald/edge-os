@@ -12,7 +12,8 @@ IPCManager& IPCManager::get()
 }
 
 void IPCManager::register_callback(
-    ProcessId process_id, const ProcessName& new_process_name, ProcessCallbackPtr callback
+    ProcessId process_id, const ProcessName& new_process_name,
+    ProcessCallbackPtr callback
 )
 {
     ipc_communicators.set_callback(process_id, callback);

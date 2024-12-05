@@ -85,12 +85,14 @@ int USER_CODE get_time_us()
     RETURN_REGISTER(r0);
 }
 
-uint32_t USER_CODE start_timer(void (*callback)(uint32_t), uint32_t microseconds)
+uint32_t USER_CODE
+start_timer(void (*callback)(uint32_t), uint32_t microseconds, bool periodic)
 {
-    SET_REGISTER(r0, (int)drivers::DriverCommand::TIMER_START);
+    SET_REGISTER(r0, (int)drivers::DriverSubscribe::TIMER_START);
     SET_REGISTER(r1, (int)callback);
     SET_REGISTER(r2, (int)microseconds);
-    TRIGGER_SVC(SystemCallType::COMMAND);
+    SET_REGISTER(r3, (int)periodic);
+    TRIGGER_SVC(SystemCallType::SUBSCRIBE);
     RETURN_REGISTER(r0);
 }
 

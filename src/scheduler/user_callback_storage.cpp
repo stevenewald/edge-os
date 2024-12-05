@@ -20,7 +20,7 @@ void UserCallbackStorage::set_callback(ProcessId id, ProcessCallbackPtr ptr)
 void UserCallbackStorage::call_callback(ProcessId id, int arg1, int arg2)
 {
     if (!has_callback(id)) {
-		panic("Attempted to call callback when it has not been set");
+        panic("Attempted to call callback when it has not been set");
     }
 
     PendingProcessCallbacks::get().add_ready_callback(id, callbacks_[id], arg1, arg2);

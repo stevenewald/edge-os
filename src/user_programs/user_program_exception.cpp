@@ -2,10 +2,16 @@
 
 #include <cstdio>
 
-void static callback(uint32_t id)
+void callback(uint32_t id)
 {
-    edge::userlib::set_led(3, 3, true);
-    edge::userlib::debug_print("Callback!\n");
+    static int b = 0;
+    edge::userlib::set_led(3, 3, ++b % 2 == 0);
+}
+
+void callback2(uint32_t id)
+{
+    static int b = 0;
+    edge::userlib::set_led(1, 1, ++b % 2 == 0);
 }
 
 void exception_task(void)
@@ -37,9 +43,9 @@ void exception_task(void)
     set_fault_handler(fault_handler);
 
     trigger_faults();
-    auto id = start_timer(&callback, 1000000);
-    // cancel_timer(id);
-    id = start_timer(&callback, 2000000);
+    start_timer(callback, 100000, true);
+    auto id2 = start_timer(callback2, 750000, true);
+    cancel_timer(id2);
 
     set_led(2, 2, true);
 
