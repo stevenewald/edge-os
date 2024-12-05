@@ -42,7 +42,7 @@ void VirtualTimerController::update_ll()
     if (val < current_time)
     {
         printf("Adding ready callback.\n");
-        PendingProcessCallbacks::get().add_ready_callback(0, reinterpret_cast<void(*)(int, int)>(&ptr->callback));
+        PendingProcessCallbacks::get().add_ready_callback(0, reinterpret_cast<void(*)(int, int)>(ptr->callback));
     }
     /* while (val < current_time) */
     /* { */

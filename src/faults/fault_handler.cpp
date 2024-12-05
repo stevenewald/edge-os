@@ -23,11 +23,11 @@ FaultHandler::FaultHandler()
     // Enable UsageFault
     SCB->SHCSR |= SCB_SHCSR_USGFAULTENA_Msk;
 
-    /* // Enable BusFault */
-    /* SCB->SHCSR |= SCB_SHCSR_BUSFAULTENA_Msk; */
+    // Enable BusFault
+    SCB->SHCSR |= SCB_SHCSR_BUSFAULTENA_Msk;
 
-    /* // Enable MemoryFault */
-    /* SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk; */
+    // Enable MemoryFault
+    SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk;
 }
 
 FaultHandler::~FaultHandler()
