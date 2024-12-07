@@ -4,7 +4,7 @@
 
 namespace edge {
 class MpuController {
-    MpuController() { }
+    MpuController() {}
 
     ~MpuController() { disable_mpu(); };
 

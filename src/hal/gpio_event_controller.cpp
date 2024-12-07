@@ -1,6 +1,7 @@
 #include "hal/gpio_event_controller.hpp"
 
 #include "hal/hal_enums.hpp"
+#include "microbit_v2.h"
 #include "nrf_gpio.h"
 
 #include <nrf_gpiote.h>
@@ -11,14 +12,13 @@ namespace edge::aidan {
 
 // TODO: expose pullup, polarity, etc
 void GPIOEventController::set_gpio_callback(
-    uint32_t pin, PinPullMode pin_resistance, GPIOEventCallback callback
+    uint32_t pin, PinPullMode pin_resistance, GPIOEventCallback callback, PinSense sense
 )
 {
     callbacks[pin] = callback;
 
-    // TODO: start high/lwo based on resistance type
     nrf_gpio_cfg_sense_input(
-        pin, to_nrf_gpio_pin_pull(pin_resistance), NRF_GPIO_PIN_SENSE_HIGH
+        pin, to_nrf_gpio_pin_pull(pin_resistance), to_nrf_gpio_pin_sense(sense)
     );
 }
 
@@ -30,7 +30,9 @@ GPIOEventController& GPIOEventController::get()
 
 void GPIOEventController::clear_gpio_callback(uint32_t pin)
 {
-    callbacks[pin] = etl::nullopt;
+    if (auto it = callbacks.find(pin); it != callbacks.end()) {
+        callbacks.erase(it);
+    }
     nrf_gpio_cfg_sense_input(pin, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_NOSENSE);
 }
 
@@ -50,12 +52,11 @@ GPIOEventController::~GPIOEventController()
 
 void GPIOEventController::handle_gpiote_port_event() const
 {
-    auto latch = NRF_GPIO->LATCH;
-
-    for (uint32_t pin = 0; pin < GPIO_PINS; pin++) {
-        if (!(latch & (1UL << pin))) {
+    for (auto& [pin, callback] : callbacks) {
+        if (!nrf_gpio_pin_latch_get(pin))
             continue;
-        }
+
+        nrf_gpio_pin_latch_clear(pin);
 
         uint32_t pin_state = nrf_gpio_pin_read(pin);
         auto state =
@@ -64,12 +65,12 @@ void GPIOEventController::handle_gpiote_port_event() const
             (pin_state != 0) ? NRF_GPIO_PIN_SENSE_LOW : NRF_GPIO_PIN_SENSE_HIGH;
         nrf_gpio_cfg_sense_input(pin, nrf_gpio_pin_pull_get(pin), opposite_state);
 
-        auto callback = GPIOEventController::get().callbacks[pin];
-        if (callback) {
-            callback.value()(state, pin);
-        }
+        callback(state, pin);
     }
-    NRF_GPIO->LATCH = latch;
+
+    // Ensure all pins cleared, even if no handler set
+    NRF_P0->LATCH = NRF_P0->LATCH;
+    NRF_P1->LATCH = NRF_P1->LATCH;
 }
 
 extern "C" {

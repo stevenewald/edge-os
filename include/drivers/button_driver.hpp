@@ -5,6 +5,7 @@
 #include "drivers/gpio_pin.hpp"
 #include "drivers/gpio_pin_event.hpp"
 #include "microbit_v2.h"
+#include "scheduler/user_callback_storage.hpp"
 
 namespace edge::drivers {
 class ButtonController {
@@ -17,9 +18,8 @@ class ButtonController {
     GPIOPinEvent event_a;
     GPIOPinEvent event_b;
 
-    using SubscriptionArray = etl::array<ProcessCallbackPtr, MAX_PROCESSES>;
-    SubscriptionArray a_subscriptions;
-    SubscriptionArray b_subscriptions;
+    UserCallbackStorage a_subscriptions;
+    UserCallbackStorage b_subscriptions;
 
     ButtonController();
     ~ButtonController() = default;
@@ -35,7 +35,7 @@ public:
     bool get_button_pressed(ButtonType button_type);
 
     void subscribe_button_press(
-        ButtonType type, ProcessCallbackPtr callback, uint8_t process_id
+        ButtonType type, ProcessCallbackPtr callback, ProcessId process_id
     );
 };
 } // namespace edge::drivers

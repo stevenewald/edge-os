@@ -161,9 +161,9 @@ typedef struct
  */
 #define NRF_DRV_TWI_DEFAULT_CONFIG                                               \
 {                                                                                \
-    .frequency          = (nrf_drv_twi_frequency_t)TWI_DEFAULT_CONFIG_FREQUENCY, \
     .scl                = 31,                                                    \
     .sda                = 31,                                                    \
+    .frequency          = (nrf_drv_twi_frequency_t)TWI_DEFAULT_CONFIG_FREQUENCY, \
     .interrupt_priority = TWI_DEFAULT_CONFIG_IRQ_PRIORITY,                       \
     .clear_bus_init     = TWI_DEFAULT_CONFIG_CLR_BUS_INIT,                       \
     .hold_bus_uninit    = TWI_DEFAULT_CONFIG_HOLD_BUS_UNINIT,                    \
