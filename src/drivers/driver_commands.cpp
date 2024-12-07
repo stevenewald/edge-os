@@ -1,7 +1,7 @@
 #include "drivers/driver_commands.hpp"
 
 #include "drivers/button_driver.hpp"
-#include "drivers/capsense_driver.hpp"
+#include "drivers/captouch_controller.hpp"
 #include "drivers/driver_enums.hpp"
 #include "drivers/led_display.hpp"
 #include "drivers/timer.hpp"

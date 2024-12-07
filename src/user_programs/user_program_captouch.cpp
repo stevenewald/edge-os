@@ -4,19 +4,12 @@
 
 void captouch_task(void)
 {
-    while (1)
-    {
-        if (edge::userlib::get_captouch_pressed())
-        {
+    while (1) {
+        if (edge::userlib::get_captouch_pressed()) {
             /* edge::userlib::debug_print("pressed\n"); */
         }
-        else 
-        {
+        else {
             /* edge::userlib::debug_print("not pressed"); */
         }
-
-
     }
-
-
 }

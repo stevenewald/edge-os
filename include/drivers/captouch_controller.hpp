@@ -1,13 +1,13 @@
 #pragma once
 
+#include "app_timer.h"
 #include "config.hpp"
 #include "drivers/driver_enums.hpp"
 #include "drivers/gpio_pin.hpp"
 #include "drivers/gpio_pin_event.hpp"
 #include "microbit_v2.h"
-#include "app_timer.h"
-#include "nrfx_timer.h"
 #include "nrf_gpio.h"
+#include "nrfx_timer.h"
 #include "util.hpp"
 
 namespace edge::drivers {
@@ -37,8 +37,6 @@ public:
     bool get_captouch_pressed();
 
     void handle_gpio_interrupt(nrf_gpio_pin_sense_t sense, int pin);
-
 };
-
 
 } // namespace edge::drivers
