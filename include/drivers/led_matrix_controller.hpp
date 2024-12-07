@@ -1,11 +1,12 @@
 #pragma once
 #include "drivers/gpio_pin.hpp"
+#include "drivers/virtual_timer_controller.hpp"
 #include "microbit_v2.h"
 
 namespace edge::drivers {
 
 // Synchronous
-class LedDisplay {
+class LedMatrixController {
     static constexpr uint8_t WIDTH = 5;
     static constexpr uint8_t HEIGHT = 5;
 
@@ -30,12 +31,20 @@ class LedDisplay {
     void set_output(uint8_t row, uint8_t col, bool enabled);
 
 public:
-    LedDisplay();
+    static LedMatrixController& get();
 
     void set_led(uint8_t row, uint8_t col, bool enabled);
 
-    void do_async_work();
+    LedMatrixController(LedMatrixController&) = delete;
+    LedMatrixController(LedMatrixController&&) = delete;
+    LedMatrixController& operator=(VirtualTimerController&) = delete;
+    LedMatrixController& operator=(VirtualTimerController&&) = delete;
+
+    friend void handle_matrix_controller();
+
+private:
+    LedMatrixController();
+    ~LedMatrixController() = default;
 };
 
-extern LedDisplay led_display;
 } // namespace edge::drivers
