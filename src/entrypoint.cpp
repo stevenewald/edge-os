@@ -9,6 +9,7 @@
 extern void ipc_part1(void);
 extern void ipc_part2(void);
 extern void exception_task(void);
+extern void spinlock_task(void);
 
 int main(void)
 {
@@ -20,6 +21,8 @@ int main(void)
 
     edge::scheduler.add_task(ipc_part1);
     edge::scheduler.add_task(ipc_part2);
+
+    edge::scheduler.add_task(spinlock_task);
 
     edge::scheduler.start_scheduler();
 }
