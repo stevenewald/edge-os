@@ -5,8 +5,13 @@
 namespace edge {
 [[noreturn]] void panic(const char* reason);
 
-using ProcessCallbackPtr = void (*)(int, int);
+// Arg1 and arg2 are optional
+using ProcessCallbackPtr = void (*)(int arg1, int arg2);
+
+using ProcessId = uint8_t;
+
 using ProcessName = etl::string<20>;
+
 enum class FaultType { Usage, Bus, Memory };
 
 struct exception_stack_registers {

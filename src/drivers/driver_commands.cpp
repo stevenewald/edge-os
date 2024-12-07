@@ -5,6 +5,7 @@
 #include "drivers/led_display.hpp"
 #include "drivers/timer.hpp"
 #include "drivers/temp_driver.hpp"
+#include "drivers/virtual_timer_controller.hpp"
 
 #include <stdio.h>
 
@@ -33,13 +34,18 @@ etl::optional<int> handle_command(DriverCommand type, int arg1, int arg2, int ar
             );
         case DriverCommand::TEMP:
             return static_cast<int>(read_temperature());
+        case DriverCommand::TIMER_CANCEL:
+            VirtualTimerController::get().virtual_timer_cancel(
+                static_cast<uint32_t>(arg1)
+            );
+            break;
     }
     return etl::nullopt;
 }
 
-void handle_subscribe(
+etl::optional<int> handle_subscribe(
     DriverSubscribe type, ProcessCallbackPtr callback, int arg1, int arg2,
-    uint8_t process_id
+    ProcessId process_id
 )
 {
     switch (type) {
@@ -48,7 +54,12 @@ void handle_subscribe(
                 static_cast<ButtonType>(arg1), callback, process_id
             );
             break;
+        case DriverSubscribe::TIMER_START:
+            return VirtualTimerController::get().virtual_timer_start(
+                static_cast<uint32_t>(arg1), callback, process_id, arg2
+            );
     }
+    return etl::nullopt;
 }
 
 } // namespace edge::drivers

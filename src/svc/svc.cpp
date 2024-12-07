@@ -29,7 +29,7 @@ etl::optional<int> handle_driver_command(exception_stack_registers* stack_regs)
     );
 }
 
-void handle_driver_subscribe(exception_stack_registers* stack_regs)
+etl::optional<int> handle_driver_subscribe(exception_stack_registers* stack_regs)
 {
     auto type = static_cast<drivers::DriverSubscribe>(stack_regs->R0);
     auto callback = reinterpret_cast<ProcessCallbackPtr>(stack_regs->R1);
@@ -82,8 +82,7 @@ etl::optional<int> handle_call(exception_stack_registers* stack_regs)
         case SystemCallType::COMMAND:
             return handle_driver_command(stack_regs);
         case SystemCallType::SUBSCRIBE:
-            handle_driver_subscribe(stack_regs);
-            break;
+            return handle_driver_subscribe(stack_regs);
         case edge::SystemCallType::IPC:
             handle_ipc(stack_regs);
             break;
@@ -106,8 +105,8 @@ __attribute__((used)) void SVC_Handler(void)
     exception_stack_registers* stack_regs;
     asm("MRS %0,PSP" : "=r"(stack_regs));
     auto ret_opt = handle_call(stack_regs);
-    if (ret_opt) {
-        stack_regs->R0 = *ret_opt;
+    if (ret_opt.has_value()) {
+        stack_regs->R0 = ret_opt.value();
     }
 }
 }

@@ -1,7 +1,7 @@
 #include "drivers/button_driver.hpp"
 
 #include "drivers/driver_enums.hpp"
-#include "scheduler/pending_process_callbacks.hpp"
+#include "scheduler/user_callback_storage.hpp"
 
 namespace edge::drivers {
 
@@ -25,14 +25,14 @@ ButtonController::ButtonController() :
 {}
 
 void ButtonController::subscribe_button_press(
-    ButtonType type, ProcessCallbackPtr callback, uint8_t process_id
+    ButtonType type, ProcessCallbackPtr callback, ProcessId process_id
 )
 {
     if (type == ButtonType::A) {
-        a_subscriptions[process_id] = callback;
+        a_subscriptions.set_callback(process_id, callback);
     }
     else if (type == ButtonType::B) {
-        b_subscriptions[process_id] = callback;
+        b_subscriptions.set_callback(process_id, callback);
     }
 }
 
@@ -48,13 +48,12 @@ bool ButtonController::get_button_pressed(ButtonType button_type)
 
 void ButtonController::handle_button_press(ButtonType type, ButtonState state)
 {
-    SubscriptionArray& button_subscriptions =
+    UserCallbackStorage& button_subscriptions =
         type == ButtonType::A ? a_subscriptions : b_subscriptions;
     for (int process_id = 0; process_id < MAX_PROCESSES; process_id++) {
-        if (button_subscriptions[process_id] != nullptr) {
-            PendingProcessCallbacks::get().add_ready_callback(
-                process_id, button_subscriptions[process_id], static_cast<int>(type),
-                static_cast<int>(state)
+        if (button_subscriptions.has_callback(process_id)) {
+            button_subscriptions.call_callback(
+                process_id, static_cast<int>(type), static_cast<int>(state)
             );
         }
     }

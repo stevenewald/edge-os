@@ -1,5 +1,19 @@
 #include "userlib/syscalls.hpp"
 
+#include <cstdio>
+
+void callback(uint32_t id)
+{
+    static int b = 0;
+    edge::userlib::set_led(3, 3, ++b % 2 == 0);
+}
+
+void callback2(uint32_t id)
+{
+    static int b = 0;
+    edge::userlib::set_led(1, 1, ++b % 2 == 0);
+}
+
 void exception_task(void)
 {
     auto trigger_faults = []() {
@@ -29,6 +43,9 @@ void exception_task(void)
     set_fault_handler(fault_handler);
 
     trigger_faults();
+    start_timer(callback, 100000, true);
+    auto id2 = start_timer(callback2, 750000, true);
+    cancel_timer(id2);
 
     set_led(2, 2, true);
 

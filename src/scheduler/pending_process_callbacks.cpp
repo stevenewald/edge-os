@@ -11,7 +11,7 @@ PendingProcessCallbacks& PendingProcessCallbacks::get()
 }
 
 void PendingProcessCallbacks::add_ready_callback(
-    uint8_t process_id, ProcessCallbackPtr callback, int arg1, int arg2
+    ProcessId process_id, ProcessCallbackPtr callback, int arg1, int arg2
 )
 {
     if (ready_callbacks[process_id].size() == MAX_READY_CALLBACKS) {
@@ -22,7 +22,7 @@ void PendingProcessCallbacks::add_ready_callback(
 }
 
 etl::optional<drivers::subscribe_callback>
-PendingProcessCallbacks::get_ready_callback(uint8_t process_id)
+PendingProcessCallbacks::get_ready_callback(ProcessId process_id)
 {
     if (ready_callbacks[process_id].empty()) {
         return etl::nullopt;
