@@ -7,6 +7,7 @@ SOFTDEVICE_MODEL = blank
 
 # ETL
 ETL_INCLUDES = ./external/etl/include/etl/array.h
+ETL_INCLUDES = ./external/etl/include/etl/variant.h
 ETL_INCLUDES += ./external/etl/include/etl/vector.h
 ETL_INCLUDES += ./external/etl/include/etl/optional.h
 ETL_INCLUDES += ./external/etl/include/etl/string.h

@@ -47,9 +47,15 @@ void VirtualTimerController::trigger_ready_timers()
     etl::optional<timer> ready_timer_opt = get_ready_timer();
     while (ready_timer_opt.has_value()) {
         timer& ready_timer = ready_timer_opt.value();
-        PendingProcessCallbacks::get().add_ready_callback(
-            ready_timer.process_id, ready_timer.callback, ready_timer.id
-        );
+        if (etl::holds_alternative<KernelCallbackPtr>(ready_timer.callback)) {
+            etl::get<KernelCallbackPtr>(ready_timer.callback)();
+        }
+        else {
+            PendingProcessCallbacks::get().add_ready_callback(
+                ready_timer.process_id,
+                etl::get<ProcessCallbackPtr>(ready_timer.callback), ready_timer.id
+            );
+        }
         if (ready_timer.periodic) {
             ready_timer.timer_value += ready_timer.duration;
             virtual_timer_start(ready_timer);
@@ -79,7 +85,8 @@ uint32_t VirtualTimerController::virtual_timer_start(const timer& timer)
 }
 
 uint32_t VirtualTimerController::virtual_timer_start(
-    uint32_t microseconds, ProcessCallbackPtr cb, ProcessId timer_creator, bool periodic
+    uint32_t microseconds, etl::variant<KernelCallbackPtr, ProcessCallbackPtr> cb,
+    ProcessId timer_creator, bool periodic
 )
 {
     static uint32_t timer_offset = 0;
