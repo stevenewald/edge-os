@@ -117,6 +117,13 @@ void USER_CODE clear_pin(uint32_t pin)
     TRIGGER_SVC(SystemCallType::COMMAND);
 }
 
+void USER_CODE make_pin_output(uint32_t pin)
+{
+    SET_REGISTER(r0, (int)drivers::DriverCommand::SET_PIN_OUTPUT);
+    SET_REGISTER(r1, (int)pin);
+    TRIGGER_SVC(SystemCallType::COMMAND);
+}
+
 void USER_CODE debug_print(const char* val)
 {
     SET_REGISTER(r0, (int)drivers::DriverCommand::TERMINAL_OUTPUT);

@@ -52,10 +52,17 @@ void update_led_states(uint32_t id)
 void led_matrix_task(void)
 {
     using namespace edge::userlib;
-    // We want to call this so that the led_matrix driver sets up all the directions of
-    // the pins so we don't have to...
-    set_led(2, 2, true);
-    set_led(2, 2, false);
+    make_pin_output(LED_COL1);
+    make_pin_output(LED_COL2);
+    make_pin_output(LED_COL3);
+    make_pin_output(LED_COL4);
+    make_pin_output(LED_COL5);
+
+    make_pin_output(LED_ROW1);
+    make_pin_output(LED_ROW2);
+    make_pin_output(LED_ROW3);
+    make_pin_output(LED_ROW4);
+    make_pin_output(LED_ROW5);
 
     start_timer(upkeep_led_matrix, 2'500, true);
     start_timer(update_led_states, 10'000, true);

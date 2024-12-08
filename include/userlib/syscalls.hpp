@@ -36,6 +36,8 @@ void set_pin(uint32_t pin);
 
 void clear_pin(uint32_t pin);
 
+void make_pin_output(uint32_t pin);
+
 // We need a syscall for this because SVC will not be preempted by SysTick
 // Technically this is insecure - it's mostly for debugging
 void debug_print(const char* string);

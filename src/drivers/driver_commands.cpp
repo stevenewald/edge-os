@@ -2,6 +2,7 @@
 
 #include "drivers/button_driver.hpp"
 #include "drivers/driver_enums.hpp"
+#include "drivers/gpio_pin.hpp"
 #include "drivers/led_matrix_controller.hpp"
 #include "drivers/virtual_timer_controller.hpp"
 #include "hal/gpio_wrapper.hpp"
@@ -36,6 +37,9 @@ etl::optional<int> handle_command(DriverCommand type, int arg1, int arg2, int ar
             break;
         case DriverCommand::CLEAR_PIN:
             edge::aidan::clear_gpio_pin(static_cast<uint32_t>(arg1));
+            break;
+        case DriverCommand::SET_PIN_OUTPUT:
+            GPIOPin(static_cast<uint32_t>(arg1), GPIOConfiguration::OUT);
             break;
     }
     return etl::nullopt;
