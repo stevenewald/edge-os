@@ -42,7 +42,6 @@ void exception_task(void)
 
     set_fault_handler(fault_handler);
 
-    trigger_faults();
     start_timer(callback, 100000, true);
     auto id2 = start_timer(callback2, 750000, true);
     cancel_timer(id2);

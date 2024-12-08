@@ -6,6 +6,7 @@
 #include "drivers/timer.hpp"
 #include "drivers/temp_driver.hpp"
 #include "drivers/virtual_timer_controller.hpp"
+#include "hal/i2c_controller.hpp"
 
 #include <stdio.h>
 
@@ -33,7 +34,10 @@ etl::optional<int> handle_command(DriverCommand type, int arg1, int arg2, int ar
                 static_cast<ButtonType>(arg1)
             );
         case DriverCommand::TEMP:
-            return static_cast<int>(read_temperature());
+            {
+                aidan::I2CController::get();
+                break;
+            }
         case DriverCommand::TIMER_CANCEL:
             VirtualTimerController::get().virtual_timer_cancel(
                 static_cast<uint32_t>(arg1)

@@ -1,10 +1,5 @@
 #include "hal/i2c_controller.hpp"
-
 #include "hal/i2c_wrapper.hpp"
-#include "microbit_v2.h"
-#include "nrf_drv_twi.h"
-#include "nrf_twi.h"
-#include "nrf_twi_mngr.h"
 
 namespace edge::aidan {
 static constexpr int QUEUE_SIZE = 1;
@@ -25,6 +20,7 @@ I2CController::I2CController()
     i2c_config.frequency = NRF_DRV_TWI_FREQ_100K;
     i2c_config.interrupt_priority = 0;
     nrf_twi_mngr_init(&twi_mngr, &i2c_config);
+    manager = twi_mngr;
     lsm303agr_init(&twi_mngr);
 }
 

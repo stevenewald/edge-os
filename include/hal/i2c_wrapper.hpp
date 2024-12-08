@@ -83,9 +83,9 @@ typedef enum {
     OUTZ_H_REG_M = 0x6D,
 } lsm303agr_mag_reg_t;
 
-uint8_t i2c_reg_read(uint8_t i2c_addr, uint8_t reg_addr);
+uint8_t i2c_reg_read(const nrf_twi_mngr_t* manager, uint8_t i2c_addr, uint8_t reg_addr);
 
-void i2c_reg_write(uint8_t i2c_addr, uint8_t reg_addr, uint8_t data);
+void i2c_reg_write(const nrf_twi_mngr_t* manager, uint8_t i2c_addr, uint8_t reg_addr, uint8_t data);
 
 void lsm303agr_init(const nrf_twi_mngr_t* i2c);
 } // namespace edge::aidan
