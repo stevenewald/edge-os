@@ -10,7 +10,6 @@ namespace edge::drivers {
 void handle_matrix_controller()
 {
     static uint8_t row_index = 0;
-    static uint8_t col_index = 0;
     LedMatrixController& controller = LedMatrixController::get();
 
     etl::for_each(
@@ -18,15 +17,18 @@ void handle_matrix_controller()
         [](auto& led_row) { led_row.clear(); }
     );
 
-    bool enabled = controller.led_enabled[row_index][col_index];
-    controller.set_output(row_index, col_index, enabled);
-
-    col_index++;
-    if (col_index == 5) {
-        ++row_index;
-        col_index = 0;
+    for (uint8_t col_index = 0; col_index < 5; ++col_index) {
+        bool state = controller.led_enabled[row_index][col_index];
+        if (!state) {
+            controller.led_cols[col_index].set();
+        }
+        else {
+            controller.led_cols[col_index].clear();
+        }
     }
-    row_index %= 5;
+    controller.led_rows[row_index].set();
+    row_index++;
+    row_index = row_index % 5;
 }
 
 LedMatrixController::LedMatrixController()
@@ -34,7 +36,7 @@ LedMatrixController::LedMatrixController()
     etl::for_each(led_rows.begin(), led_rows.end(), [](auto& row) { row.clear(); });
     etl::for_each(led_cols.begin(), led_cols.end(), [](auto& col) { col.set(); });
     VirtualTimerController::get().virtual_timer_start(
-        25 / 5, etl::delegate<void()>::create<handle_matrix_controller>(), 0, true
+        100, etl::delegate<void()>::create<handle_matrix_controller>(), 0, true
     );
 }
 
@@ -44,29 +46,9 @@ LedMatrixController& LedMatrixController::get()
     return controller;
 }
 
-void LedMatrixController::set_output(uint8_t row, uint8_t col, bool enabled)
-{
-    led_rows[row].write(enabled);
-    led_cols[col].write(!enabled);
-}
-
 void LedMatrixController::set_led(uint8_t row, uint8_t col, bool enabled)
 {
     led_enabled[row][col] = enabled;
 }
-
-/* void LedMatrixController::do_async_work(uint32_t id) */
-/* { */
-/*     for (uint8_t row = 0; row < HEIGHT; row++) { */
-/*         for (uint8_t col = 0; col < WIDTH; col++) { */
-/*             if (!led_enabled[row][col]) { */
-/*                 continue; */
-/*             } */
-/*             set_output(row, col, true); */
-/*             nrf_delay_us(200); */
-/*             set_output(row, col, false); */
-/*         } */
-/*     } */
-/* } */
 
 } // namespace edge::drivers

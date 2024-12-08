@@ -28,8 +28,6 @@ class LedMatrixController {
         GPIOPin{LED_COL5, GPIOConfiguration::OUT}
     };
 
-    void set_output(uint8_t row, uint8_t col, bool enabled);
-
 public:
     static LedMatrixController& get();
 
