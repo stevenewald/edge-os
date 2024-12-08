@@ -19,6 +19,12 @@ class CapsenseController {
 
     bool touched;
 
+    bool test_done;
+
+    uint32_t timed_id;
+
+    etl::mutex doneLock;
+
     GPIOPinEvent event;
 
     CapsenseController();
@@ -37,6 +43,11 @@ public:
     bool get_captouch_pressed();
 
     void handle_gpio_interrupt(nrf_gpio_pin_sense_t sense, int pin);
+
+    void handle_timer_interrupt();
+
+    void start_capacitive_test();
+
 };
 
 } // namespace edge::drivers
