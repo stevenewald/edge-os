@@ -1,6 +1,7 @@
 #pragma once
 #include "config.hpp"
 #include "drivers/driver_enums.hpp"
+#include "stdint.h"
 
 namespace edge {
 // One option is to make the drivers and other things non singletons and have the
@@ -11,7 +12,7 @@ namespace edge {
 // TLDR: singleton vs everything owned by scheduler, food for thought
 class PendingProcessCallbacks {
 public:
-    static constexpr uint8_t MAX_READY_CALLBACKS = 10;
+    static constexpr uint8_t MAX_READY_CALLBACKS = 20;
 
 private:
     etl::array<

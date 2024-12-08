@@ -7,10 +7,10 @@
 
 #include <cstdio>
 
-uint8_t row_index = 0;
-bool led_states[5][5] = {false};
-uint32_t rows[] = {LED_ROW1, LED_ROW2, LED_ROW3, LED_ROW4, LED_ROW5};
-uint32_t cols[] = {LED_COL1, LED_COL2, LED_COL3, LED_COL4, LED_COL5};
+static uint8_t row_index = 0;
+static bool led_states[5][5];
+static uint32_t rows[] = {LED_ROW1, LED_ROW2, LED_ROW3, LED_ROW4, LED_ROW5};
+static uint32_t cols[] = {LED_COL1, LED_COL2, LED_COL3, LED_COL4, LED_COL5};
 
 static uint8_t control_row = 0;
 static uint8_t control_col = 0;
@@ -64,7 +64,15 @@ void led_matrix_task(void)
     make_pin_output(LED_ROW4);
     make_pin_output(LED_ROW5);
 
-    start_timer(upkeep_led_matrix, 2'500, true);
+    for (int i = 0; i < 5; ++i)
+    {
+        for (int j = 0; j < 5; ++j)
+         {
+            led_states[i][j] = false;
+        }
+    }
+
+    start_timer(upkeep_led_matrix, 3'500, true);
     start_timer(update_led_states, 10'000, true);
 
     while (1) {
