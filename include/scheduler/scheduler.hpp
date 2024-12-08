@@ -1,7 +1,7 @@
 #pragma once
 #include "config.hpp"
-#include "task.hpp"
 #include "util.hpp"
+#include "task.hpp"
 
 #include <stdio.h>
 

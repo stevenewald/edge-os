@@ -2,8 +2,8 @@
 
 #include "drivers/driver_commands.hpp"
 #include "nrf52833.h"
-#include "scheduler/mpu.hpp"
 #include "scheduler/pending_process_callbacks.hpp"
+#include "scheduler/mpu.hpp"
 #include "util.hpp"
 
 namespace edge {
