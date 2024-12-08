@@ -9,6 +9,7 @@
 extern void ipc_part1(void);
 extern void ipc_part2(void);
 extern void exception_task(void);
+extern void led_matrix_task(void);
 
 int main(void)
 {
@@ -16,10 +17,12 @@ int main(void)
 
     edge::FaultHandler::get();
 
-    edge::scheduler.add_task(exception_task);
+    /* edge::scheduler.add_task(exception_task); */
 
-    edge::scheduler.add_task(ipc_part1);
-    edge::scheduler.add_task(ipc_part2);
+    /* edge::scheduler.add_task(ipc_part1); */
+    /* edge::scheduler.add_task(ipc_part2); */
+
+    edge::scheduler.add_task(led_matrix_task);
 
     edge::scheduler.start_scheduler();
 }

@@ -4,6 +4,7 @@
 #include "drivers/driver_enums.hpp"
 #include "drivers/led_display.hpp"
 #include "drivers/virtual_timer_controller.hpp"
+#include "hal/gpio_wrapper.hpp"
 
 #include <stdio.h>
 
@@ -34,6 +35,12 @@ etl::optional<int> handle_command(DriverCommand type, int arg1, int arg2, int ar
             VirtualTimerController::get().virtual_timer_cancel(
                 static_cast<uint32_t>(arg1)
             );
+            break;
+        case DriverCommand::SET_PIN:
+            edge::aidan::set_gpio_pin(static_cast<uint32_t>(arg1));
+            break;
+        case DriverCommand::CLEAR_PIN:
+            edge::aidan::clear_gpio_pin(static_cast<uint32_t>(arg1));
             break;
     }
     return etl::nullopt;

@@ -103,6 +103,20 @@ void USER_CODE cancel_timer(uint32_t timer_id)
     TRIGGER_SVC(SystemCallType::COMMAND);
 }
 
+void USER_CODE set_pin(uint32_t pin)
+{
+    SET_REGISTER(r0, (int)drivers::DriverCommand::SET_PIN);
+    SET_REGISTER(r1, (int)pin);
+    TRIGGER_SVC(SystemCallType::COMMAND);
+}
+
+void USER_CODE clear_pin(uint32_t pin)
+{
+    SET_REGISTER(r0, (int)drivers::DriverCommand::CLEAR_PIN);
+    SET_REGISTER(r1, (int)pin);
+    TRIGGER_SVC(SystemCallType::COMMAND);
+}
+
 void USER_CODE debug_print(const char* val)
 {
     SET_REGISTER(r0, (int)drivers::DriverCommand::TERMINAL_OUTPUT);
