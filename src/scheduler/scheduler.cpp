@@ -97,9 +97,6 @@ __attribute__((naked, used)) void PendSV_Handler()
 
     asm volatile("CPSIE I");
 
-    // Always want to call drivers on context switch
-    drivers::do_async_work();
-
     // Return in thumb/process mode and restore using extended stack frame
     asm volatile("ldr r0,=0xffffffed\n"
                  "bx r0");

@@ -3,28 +3,22 @@
 #include "drivers/button_driver.hpp"
 #include "drivers/captouch_controller.hpp"
 #include "drivers/driver_enums.hpp"
-#include "drivers/led_display.hpp"
-#include "drivers/timer.hpp"
+#include "drivers/led_matrix_controller.hpp"
 #include "drivers/virtual_timer_controller.hpp"
+#include "util.hpp"
 
 #include <stdio.h>
 
 namespace edge::drivers {
 
-// Runs on context switch
-void do_async_work()
-{
-    led_display.do_async_work();
-}
-
 etl::optional<int> handle_command(DriverCommand type, int arg1, int arg2, int arg3)
 {
     switch (type) {
         case DriverCommand::LED_DISPLAY:
-            led_display.set_led(arg1, arg2, arg3);
+            LedMatrixController::get().set_led(arg1, arg2, arg3);
             break;
         case DriverCommand::GET_TIME:
-            return timer4_controller.get_time_us();
+            return VirtualTimerController::get().read_timer();
         case DriverCommand::TERMINAL_OUTPUT:
             printf((char*)arg1);
             break;
@@ -56,7 +50,7 @@ etl::optional<int> handle_subscribe(
             break;
         case DriverSubscribe::TIMER_START:
             return VirtualTimerController::get().virtual_timer_start(
-                static_cast<uint32_t>(arg1), callback, process_id, arg2
+                static_cast<uint32_t>(arg1), callback, 0, arg2
             );
     }
     return etl::nullopt;
