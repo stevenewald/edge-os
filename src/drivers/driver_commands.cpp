@@ -3,7 +3,6 @@
 #include "drivers/button_driver.hpp"
 #include "drivers/driver_enums.hpp"
 #include "drivers/led_matrix_controller.hpp"
-#include "drivers/timer.hpp"
 #include "drivers/virtual_timer_controller.hpp"
 #include "util.hpp"
 
@@ -18,7 +17,7 @@ etl::optional<int> handle_command(DriverCommand type, int arg1, int arg2, int ar
             LedMatrixController::get().set_led(arg1, arg2, arg3);
             break;
         case DriverCommand::GET_TIME:
-            return timer4_controller.get_time_us();
+            return VirtualTimerController::get().read_timer();
         case DriverCommand::TERMINAL_OUTPUT:
             printf((char*)arg1);
             break;

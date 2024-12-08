@@ -41,6 +41,8 @@ public:
     );
     void virtual_timer_cancel(uint32_t timer_id);
 
+    uint32_t read_timer() const;
+
     static VirtualTimerController& get();
 
     VirtualTimerController(VirtualTimerController&) = delete;
@@ -56,8 +58,6 @@ private:
     etl::optional<timer> get_ready_timer();
 
     void enqueue_next_timer() const;
-
-    uint32_t read_timer() const;
 
     uint32_t timer_start(
         uint32_t microseconds, ProcessCallbackPtr callback, ProcessId timer_creator
