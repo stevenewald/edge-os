@@ -1,5 +1,4 @@
 #include "scheduler/pending_process_callbacks.hpp"
-#include "userlib/syscalls.hpp"
 
 #include <stdio.h>
 

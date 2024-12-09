@@ -38,8 +38,8 @@ etl::optional<int> handle_command(DriverCommand type, int arg1, int arg2, int ar
         case DriverCommand::CLEAR_PIN:
             edge::aidan::clear_gpio_pin(static_cast<uint32_t>(arg1));
             break;
-        case DriverCommand::SET_PIN_OUTPUT:
-            GPIOPin(static_cast<uint32_t>(arg1), GPIOConfiguration::OUT);
+        case DriverCommand::CONFIG_PIN_OUTPUT:
+            edge::aidan::set_gpio_pin_output(static_cast<uint32_t>(arg1));
             break;
     }
     return etl::nullopt;
