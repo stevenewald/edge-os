@@ -23,6 +23,8 @@ void get_button_pressed(
 
 bool get_captouch_pressed();
 
+void subscribe_captouch_pressed(void (*callback)(int, int));
+
 void send_ipc(const char* name, uint32_t message);
 
 void subscribe_ipc(const char* name, void (*callback)(int message));

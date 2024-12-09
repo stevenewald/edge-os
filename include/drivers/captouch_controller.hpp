@@ -1,13 +1,11 @@
 #pragma once
 
-#include "app_timer.h"
-#include "config.hpp"
 #include "drivers/driver_enums.hpp"
 #include "drivers/gpio_pin.hpp"
 #include "drivers/gpio_pin_event.hpp"
 #include "microbit_v2.h"
 #include "nrf_gpio.h"
-#include "nrfx_timer.h"
+#include "scheduler/user_callback_storage.hpp"
 #include "util.hpp"
 
 namespace edge::drivers {
@@ -15,15 +13,11 @@ namespace edge::drivers {
 class CapsenseController {
     GPIOPin touch_logo{TOUCH_LOGO, GPIOConfiguration::IN_NORES};
 
-    etl::array<ProcessCallbackPtr, MAX_PROCESSES> subscriptions;
+    UserCallbackStorage subscriptions;
 
     bool touched;
 
-    bool test_done;
-
-    uint32_t timed_id;
-
-    etl::mutex doneLock;
+    uint32_t time_test_started;
 
     GPIOPinEvent event;
 
@@ -44,10 +38,7 @@ public:
 
     void handle_gpio_interrupt(nrf_gpio_pin_sense_t sense, int pin);
 
-    void handle_timer_interrupt();
-
     void start_capacitive_test();
-
 };
 
 } // namespace edge::drivers

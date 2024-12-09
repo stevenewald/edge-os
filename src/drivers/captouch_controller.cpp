@@ -1,5 +1,6 @@
 #include "drivers/captouch_controller.hpp"
 
+#include "config.hpp"
 #include "drivers/driver_enums.hpp"
 #include "drivers/gpio_pin_event.hpp"
 #include "drivers/virtual_timer_controller.hpp"
@@ -11,18 +12,19 @@
 
 namespace edge::drivers {
 
-
 CapsenseController::CapsenseController() :
     touched(false),
-    test_done(false),
     event{
         TOUCH_LOGO, GPIOConfiguration::IN_NORES,
         aidan::GPIOEventController::GPIOEventCallback::create<
             CapsenseController, &CapsenseController::handle_gpio_interrupt>(*this)
     }
 {
-    VirtualTimerController& virtualTimerController = VirtualTimerController::get();
-    virtualTimerController.virtual_timer_start(100000, etl::delegate<void()>::create<CapsenseController, &CapsenseController::start_capacitive_test>(*this), 0, true);
+    touch_logo.clear();
+    nrf_gpio_cfg(
+        TOUCH_LOGO, NRF_GPIO_PIN_DIR_OUTPUT, NRF_GPIO_PIN_INPUT_DISCONNECT,
+        NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE
+    );
 };
 
 CapsenseController& CapsenseController::get()
@@ -35,8 +37,7 @@ void CapsenseController::subscribe_captouch_press(
     ProcessCallbackPtr callback, uint8_t process_id
 )
 {
-    subscriptions[process_id] = callback;
-    return;
+    subscriptions.set_callback(process_id, callback);
 }
 
 bool CapsenseController::get_captouch_pressed()
@@ -46,38 +47,22 @@ bool CapsenseController::get_captouch_pressed()
 
 void CapsenseController::handle_gpio_interrupt(nrf_gpio_pin_sense_t sense, int pin)
 {
-    if (test_done == false)
-    {
-        test_done = true;
-        touched = false;
-        printf("Not touched\n");
-    }
-    VirtualTimerController::get().virtual_timer_cancel(timed_id);
-}
-
-void CapsenseController::handle_timer_interrupt()
-{
-    if (test_done == false)
-    {
-        test_done = true;
+    if (sense == NRF_GPIO_PIN_SENSE_LOW) {
         touched = true;
-        printf("Touched\n");
     }
-
+    else if (sense == NRF_GPIO_PIN_SENSE_HIGH) {
+        touched = false;
+    }
+    else {
+        printf("Unexpected cap sense pin sense\n");
+    }
+    for (int process_id = 0; process_id < MAX_PROCESSES; ++process_id)
+    {
+        if (subscriptions.has_callback(process_id))
+        {
+            subscriptions.call_callback(process_id, static_cast<int>(sense), static_cast<int>(pin));
+        }
+    }
 }
-
-void CapsenseController::start_capacitive_test()
-{
-    printf("Starting cap test\n");
-    test_done = false;
-    VirtualTimerController& vtcontroller = VirtualTimerController::get();
-    touch_logo.clear();
-    /* vtcontroller.virtual_timer_start(30000, etl::delegate<void()>::create<CapsenseController, &CapsenseController::handle_timer_interrupt>(*this), 0, false); */
-    nrf_gpio_cfg(
-        TOUCH_LOGO, NRF_GPIO_PIN_DIR_INPUT, NRF_GPIO_PIN_INPUT_DISCONNECT,
-        NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_S0S1, NRF_GPIO_PIN_NOSENSE
-    );
-}
-
 
 } // namespace edge::drivers

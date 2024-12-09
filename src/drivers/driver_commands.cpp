@@ -52,6 +52,9 @@ etl::optional<int> handle_subscribe(
             return VirtualTimerController::get().virtual_timer_start(
                 static_cast<uint32_t>(arg1), callback, 0, arg2
             );
+        case DriverSubscribe::NOTIFY_CAPTOUCH:
+            CapsenseController::get().subscribe_captouch_press(callback, process_id);
+            break;
     }
     return etl::nullopt;
 }
