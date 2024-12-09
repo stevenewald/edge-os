@@ -5,7 +5,7 @@
 
 void callback(int a, int b)
 {
-    edge::userlib::debug_print("Touch detected.\n");
+    edge::userlib::debug_print("CALLBACK: Touch detected.\n");
 }
 
 void captouch_task(void)
@@ -19,5 +19,6 @@ void captouch_task(void)
         else {
             edge::userlib::debug_print("not pressed\n");
         }
+        edge::userlib::yield();
     }
 }

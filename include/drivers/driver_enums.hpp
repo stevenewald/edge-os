@@ -1,5 +1,6 @@
 #pragma once
 
+#include "hal/hal_enums.hpp"
 #include "util.hpp"
 
 namespace edge::drivers {
@@ -28,5 +29,7 @@ struct subscribe_callback {
     int arg1;
     int arg2;
 };
+
+aidan::PinPullMode to_pin_pull_mode(drivers::GPIOConfiguration config);
 
 } // namespace edge::drivers

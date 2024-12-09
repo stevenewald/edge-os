@@ -13,10 +13,8 @@ public:
         aidan::GPIOEventController::GPIOEventCallback callback
     ) : pin(pin)
     {
-        // TODO: add resistance
         aidan::GPIOEventController::get().set_gpio_callback(
-            pin, aidan::PinPullMode::NONE, callback
-        );
+            pin, to_pin_pull_mode(resistance), callback);
     }
 
     GPIOPinEvent(const GPIOPinEvent&) = delete;

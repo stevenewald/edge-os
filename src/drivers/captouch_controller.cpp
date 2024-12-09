@@ -1,5 +1,6 @@
 #include "drivers/captouch_controller.hpp"
 
+#include "config.hpp"
 #include "microbit_v2.h"
 #include "nrf_gpio.h"
 
@@ -51,16 +52,16 @@ void CapsenseController::handle_gpio_interrupt(nrf_gpio_pin_sense_t sense, int p
         printf("Unexpected cap sense pin sense\n");
     }
     if ((prev_touched == false) && (touched == true)) {
-        printf("Detected change in touch.\n");
+        printf("Touch happened.\n");
+        for (int process_id = 0; process_id < MAX_PROCESSES; ++process_id)
+        {
+            if (subscriptions.has_callback(process_id))
+            {
+                subscriptions.call_callback(process_id, static_cast<int>(sense),
+                static_cast<int>(pin));
+            }
+        }
     }
-    /* for (int process_id = 0; process_id < MAX_PROCESSES; ++process_id) */
-    /* { */
-    /*     if (subscriptions.has_callback(process_id)) */
-    /*     { */
-    /*         subscriptions.call_callback(process_id, static_cast<int>(sense),
-     * static_cast<int>(pin)); */
-    /*     } */
-    /* } */
 }
 
 } // namespace edge::drivers
