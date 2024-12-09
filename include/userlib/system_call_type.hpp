@@ -9,6 +9,7 @@ enum class SystemCallType : uint8_t {
     COMMAND = 2,
     SUBSCRIBE = 3,
     IPC = 4,
-    SET_FAULT_HANDLER = 5
+    SET_FAULT_HANDLER = 5,
+    RESTORE_REGS = 6
 };
 }
