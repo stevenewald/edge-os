@@ -16,7 +16,7 @@ int main(void)
 
     edge::FaultHandler::get();
 
-    edge::scheduler.add_task(exception_task);
+    // edge::scheduler.add_task(exception_task);
 
     edge::scheduler.add_task(ipc_part1);
     edge::scheduler.add_task(ipc_part2);

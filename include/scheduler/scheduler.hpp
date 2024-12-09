@@ -1,7 +1,7 @@
 #pragma once
 #include "config.hpp"
-#include "util.hpp"
 #include "task.hpp"
+#include "util.hpp"
 
 #include <stdio.h>
 
@@ -31,6 +31,7 @@ public:
     void change_current_task_priority(uint8_t new_priority);
 
     void yield_current_task();
+    void restore_current_task_regs(exception_stack_registers* regs);
 
 private:
     void handle_first_svc_hit();
