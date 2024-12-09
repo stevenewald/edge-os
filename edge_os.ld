@@ -32,7 +32,14 @@ SECTIONS
   {
 	  PROVIDE(__start_user_programs_data = .);
 	  _build/user_*.o(.data*)
-	  _build/user_*.o(.bss*)
+	  /* _build/user_*.o(.bss*)
+	   * bss needs to be within __bss_start__ and __bss_end__ to be zeroed by the c lib on startup
+	   * however, that makes it really really hard to isolate
+	   * I don't think this current isolation technique will work for bss, so I've enabled user read/write of all bss code
+	   * If we made a real OS, we would have a different binary for each program, but because this is a mini os, we didn't bother.
+	   *
+	   * Because of this reason (and discovering it during finals week), I have disabled the MPU
+	   * */
 	  PROVIDE(__end_user_programs_data = .);
 	  ASSERT((__end_user_programs_data - __start_user_programs_data) <= 16384, "Error: .user_programs_data section exceeds 16 KB");
   } > RAM

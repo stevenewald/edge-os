@@ -68,6 +68,11 @@ void handle_ipc(exception_stack_registers* stack_regs)
     }
 }
 
+void restore_regs(exception_stack_registers* stack_regs)
+{
+    scheduler.restore_current_task_regs(stack_regs);
+}
+
 etl::optional<int> handle_call(exception_stack_registers* stack_regs)
 {
     auto call_type =
@@ -88,6 +93,9 @@ etl::optional<int> handle_call(exception_stack_registers* stack_regs)
             break;
         case edge::SystemCallType::SET_FAULT_HANDLER:
             handle_set_fault_handler(stack_regs);
+            break;
+        case edge::SystemCallType::RESTORE_REGS:
+            restore_regs(stack_regs);
             break;
     }
     return etl::nullopt;

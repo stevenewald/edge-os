@@ -19,6 +19,8 @@ MpuController& MpuController::get()
 
 void MpuController::initialize_mpu() const
 {
+    // MPU disabled. Read comment in linker script to see why
+    return;
     auto user_code_start = reinterpret_cast<unsigned>(&__start_user_programs_code);
     MPU->RNR = 0;
     MPU->RBAR = (user_code_start & MPU_RBAR_ADDR_Msk);
