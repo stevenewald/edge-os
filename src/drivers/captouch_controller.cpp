@@ -1,19 +1,12 @@
 #include "drivers/captouch_controller.hpp"
 
-#include "config.hpp"
-#include "drivers/driver_enums.hpp"
-#include "drivers/gpio_pin_event.hpp"
-#include "drivers/virtual_timer_controller.hpp"
-#include "hal/gpio_wrapper.hpp"
-#include "hal/hal_enums.hpp"
 #include "microbit_v2.h"
 #include "nrf_gpio.h"
-#include "userlib/syscalls.hpp"
 
 namespace edge::drivers {
 
 CapsenseController::CapsenseController() :
-    touched(false),
+    touched(false), prev_touched(false),
     event{
         TOUCH_LOGO, GPIOConfiguration::IN_NORES,
         aidan::GPIOEventController::GPIOEventCallback::create<
@@ -47,6 +40,7 @@ bool CapsenseController::get_captouch_pressed()
 
 void CapsenseController::handle_gpio_interrupt(nrf_gpio_pin_sense_t sense, int pin)
 {
+    prev_touched = touched;
     if (sense == NRF_GPIO_PIN_SENSE_LOW) {
         touched = true;
     }
@@ -56,13 +50,17 @@ void CapsenseController::handle_gpio_interrupt(nrf_gpio_pin_sense_t sense, int p
     else {
         printf("Unexpected cap sense pin sense\n");
     }
-    for (int process_id = 0; process_id < MAX_PROCESSES; ++process_id)
-    {
-        if (subscriptions.has_callback(process_id))
-        {
-            subscriptions.call_callback(process_id, static_cast<int>(sense), static_cast<int>(pin));
-        }
+    if ((prev_touched == false) && (touched == true)) {
+        printf("Detected change in touch.\n");
     }
+    /* for (int process_id = 0; process_id < MAX_PROCESSES; ++process_id) */
+    /* { */
+    /*     if (subscriptions.has_callback(process_id)) */
+    /*     { */
+    /*         subscriptions.call_callback(process_id, static_cast<int>(sense),
+     * static_cast<int>(pin)); */
+    /*     } */
+    /* } */
 }
 
 } // namespace edge::drivers

@@ -19,6 +19,5 @@ void captouch_task(void)
         else {
             edge::userlib::debug_print("not pressed\n");
         }
-        edge::userlib::yield();
     }
 }

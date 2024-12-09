@@ -17,6 +17,8 @@ class CapsenseController {
 
     bool touched;
 
+    bool prev_touched;
+
     uint32_t time_test_started;
 
     GPIOPinEvent event;

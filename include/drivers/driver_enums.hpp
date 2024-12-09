@@ -12,7 +12,11 @@ enum class DriverCommand {
     CAPTOUCH = 5,
 };
 
-enum class DriverSubscribe { NOTIFY_BUTTON_PRESS = 0, TIMER_START = 1, NOTIFY_CAPTOUCH = 2 };
+enum class DriverSubscribe {
+    NOTIFY_BUTTON_PRESS = 0,
+    TIMER_START = 1,
+    NOTIFY_CAPTOUCH = 2
+};
 
 enum class GPIOConfiguration { OUT, IN_NORES, IN_PDR, IN_PUR };
 
