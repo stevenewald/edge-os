@@ -12,6 +12,7 @@ extern void exception_task(void);
 extern void spinlock_task(void);
 extern void ending_task(void);
 extern void sensor_task(void);
+extern void captouch_task(void);
 
 int main(void)
 {
@@ -19,6 +20,7 @@ int main(void)
 
     edge::FaultHandler::get();
 
+    edge::scheduler.add_task(captouch_task);
     edge::scheduler.add_task(exception_task);
 
     edge::scheduler.add_task(ipc_part1);

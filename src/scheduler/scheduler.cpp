@@ -2,8 +2,9 @@
 
 #include "drivers/driver_commands.hpp"
 #include "nrf52833.h"
-#include "scheduler/pending_process_callbacks.hpp"
 #include "scheduler/mpu.hpp"
+#include "scheduler/pending_process_callbacks.hpp"
+#include "userlib/system_call_type.hpp"
 #include "util.hpp"
 
 namespace edge {
@@ -22,6 +23,7 @@ void Scheduler::start_scheduler()
 
     NVIC_SetPriority(PendSV_IRQn, 0x3);
     NVIC_SetPriority(SysTick_IRQn, 0x1);
+
     MpuController::get().initialize_mpu();
     asm volatile("CPSIE I");
     asm volatile("SVC #0");
@@ -97,9 +99,6 @@ __attribute__((naked, used)) void PendSV_Handler()
 
     asm volatile("CPSIE I");
 
-    // Always want to call drivers on context switch
-    drivers::do_async_work();
-
     // Return in thumb/process mode and restore using extended stack frame
     asm volatile("ldr r0,=0xffffffed\n"
                  "bx r0");
@@ -115,24 +114,12 @@ __attribute__((used)) void SysTick_Handler()
 // I don't think there's any way to make this cleaner lol
 __attribute__((used, naked)) USER_CODE void restore_regs()
 {
-    // Load fpscr first so we can avoid dirtying r0 after its popped
-    asm volatile("ldr r0, [sp, #96]\n"
-                 "vmsr fpscr, r0\n");
+    asm volatile("svc %0" ::"I"(SystemCallType::RESTORE_REGS));
+}
 
-    // Pop regs as usual
-    asm volatile("pop {r0, r1, r2, r3, r12, lr}");
-
-    // Skip SP and RETPSR. SP will be loaded last
-    // RETPSR should be ignored because we already popped when returning from exception
-    asm volatile("add sp, #8");
-
-    // Pop caller saved FP registers
-    asm volatile("vpop {s0-s15}");
-
-    // Skip FPSCR and 2 reserved regs
-    asm volatile("add sp, #12");
-
-    asm volatile("ldr pc, [sp, #-84]");
+void Scheduler::restore_current_task_regs(exception_stack_registers* regs)
+{
+    __set_PSP(reinterpret_cast<unsigned>(&regs[1]) + 4);
 }
 
 void Scheduler::yield_current_task()

@@ -4,14 +4,16 @@
 
 void callback(uint32_t id)
 {
-    static int b = 0;
-    edge::userlib::set_led(3, 3, ++b % 2 == 0);
+    static bool b = false;
+    edge::userlib::set_led(2, 2, b);
+    b = !b;
 }
 
 void callback2(uint32_t id)
 {
-    static int b = 0;
-    edge::userlib::set_led(1, 1, ++b % 2 == 0);
+    static bool b = false;
+    edge::userlib::set_led(2, 2, b);
+    b = !b;
 }
 
 void exception_task(void)
@@ -46,8 +48,6 @@ void exception_task(void)
     start_timer(callback, 100000, true);
     auto id2 = start_timer(callback2, 750000, true);
     cancel_timer(id2);
-
-    set_led(2, 2, true);
 
     while (1) {
         yield();

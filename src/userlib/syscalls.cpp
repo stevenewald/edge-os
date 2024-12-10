@@ -78,6 +78,20 @@ bool USER_CODE get_button_pressed(drivers::ButtonType button_type)
     RETURN_REGISTER(r0);
 }
 
+bool USER_CODE get_captouch_pressed()
+{
+    SET_REGISTER(r0, (int)drivers::DriverCommand::CAPTOUCH);
+    TRIGGER_SVC(SystemCallType::COMMAND);
+    RETURN_REGISTER(r0);
+}
+
+void USER_CODE subscribe_captouch_pressed(void (*callback)(drivers::ButtonState))
+{
+    SET_REGISTER(r0, (int)drivers::DriverSubscribe::NOTIFY_CAPTOUCH);
+    SET_REGISTER(r1, (int)callback);
+    TRIGGER_SVC(SystemCallType::SUBSCRIBE);
+}
+
 int USER_CODE get_time_us()
 {
     SET_REGISTER(r0, (int)drivers::DriverCommand::GET_TIME);
