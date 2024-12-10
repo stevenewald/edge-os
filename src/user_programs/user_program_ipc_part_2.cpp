@@ -8,10 +8,14 @@ void ipc_part2(void)
     static void (*on_button_press)(ButtonType, ButtonState) = [](ButtonType type,
                                                                  ButtonState state) {
         if (state == ButtonState::DOWN) {
-            if (type == ButtonType::A)
+            if (type == ButtonType::A) {
+                edge::userlib::debug_print("Button A pressed\n");
                 send_ipc("LED_DISPLAY", true);
-            else
+            }
+            else {
                 send_ipc("LED_DISPLAY", false);
+                edge::userlib::debug_print("Button B pressed\n");
+            }
         }
     };
 
