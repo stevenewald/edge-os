@@ -7,6 +7,7 @@ namespace edge {
 
 // Arg1 and arg2 are optional
 using ProcessCallbackPtr = void (*)(int arg1, int arg2);
+using KernelCallbackPtr = etl::delegate<void()>;
 
 using ProcessId = uint8_t;
 

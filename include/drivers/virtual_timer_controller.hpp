@@ -12,7 +12,7 @@ void TIMER3_IRQHandler(void);
 struct timer {
     uint32_t id;
 
-    ProcessCallbackPtr callback;
+    etl::variant<KernelCallbackPtr, ProcessCallbackPtr> callback;
 
     uint32_t timer_value;
     ProcessId process_id;
@@ -35,8 +35,9 @@ class VirtualTimerController {
 
 public:
     uint32_t virtual_timer_start(
-        uint32_t microseconds, ProcessCallbackPtr callback, ProcessId timer_creator,
-        bool periodic
+        uint32_t microseconds,
+        etl::variant<KernelCallbackPtr, ProcessCallbackPtr> callback,
+        ProcessId timer_creator, bool periodic
     );
     void virtual_timer_cancel(uint32_t timer_id);
 
