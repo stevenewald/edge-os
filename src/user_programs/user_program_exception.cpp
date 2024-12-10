@@ -31,13 +31,13 @@ void exception_task(void)
     static void (*fault_handler)(edge::FaultType) = [](edge::FaultType type) {
         switch (type) {
             case edge::FaultType::Usage:
-                debug_print("USAGE FAULT TRIGGERED\n");
+                debug_print("FAULT HANDLER PROGRAM: USAGE FAULT TRIGGERED\n");
                 break;
             case edge::FaultType::Bus:
-                debug_print("BUS FAULT TRIGGERED\n");
+                debug_print("FAULT HANDLER PROGRAM: BUS FAULT TRIGGERED\n");
                 break;
             case edge::FaultType::Memory:
-                debug_print("MEMORY FAULT TRIGGERED\n");
+                debug_print("FAULT HANDLER PROGRAM: MEMORY FAULT TRIGGERED\n");
                 break;
         }
     };

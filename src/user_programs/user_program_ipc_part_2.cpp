@@ -9,12 +9,12 @@ void ipc_part2(void)
                                                                  ButtonState state) {
         if (state == ButtonState::DOWN) {
             if (type == ButtonType::A) {
-                edge::userlib::debug_print("Button A pressed\n");
+                edge::userlib::debug_print("IPC RECEIVER PROGRAM: Button A pressed\n");
                 send_ipc("LED_DISPLAY", true);
             }
             else {
                 send_ipc("LED_DISPLAY", false);
-                edge::userlib::debug_print("Button B pressed\n");
+                edge::userlib::debug_print("IPC RECEIVER PROGRAM: Button B pressed\n");
             }
         }
     };

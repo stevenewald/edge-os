@@ -21,7 +21,7 @@ void UserCallbackStorage::call_callback(ProcessId id, int arg1, int arg2)
 {
     if (!has_callback(id)) {
         printf(
-            "Attempted to call callback when it has not been set for process %d\n", id
+            "Process %d has finished executing\n", id
         );
     }
 

@@ -6,10 +6,10 @@
 void callback(edge::drivers::ButtonState a)
 {
     if (a == edge::drivers::ButtonState::UP) {
-        edge::userlib::debug_print("CALLBACK: Finger lifted.\n");
+        edge::userlib::debug_print("CAPTOUCH PROGRAM: Finger lifted.\n");
     }
     else {
-        edge::userlib::debug_print("CALLBACK: Finger pressed.\n");
+        edge::userlib::debug_print("CAPTOUCH PROGRAM: Finger pressed.\n");
     }
 }
 
