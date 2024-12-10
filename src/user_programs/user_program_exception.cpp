@@ -6,14 +6,14 @@ void callback(uint32_t id)
 {
     static bool b = false;
     edge::userlib::set_led(2, 2, b);
-	b=!b;
+    b = !b;
 }
 
 void callback2(uint32_t id)
 {
     static bool b = false;
     edge::userlib::set_led(2, 2, b);
-	b=!b;
+    b = !b;
 }
 
 void exception_task(void)

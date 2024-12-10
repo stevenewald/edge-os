@@ -1,6 +1,7 @@
 #include "drivers/driver_commands.hpp"
 
 #include "drivers/button_driver.hpp"
+#include "drivers/captouch_controller.hpp"
 #include "drivers/driver_enums.hpp"
 #include "drivers/led_matrix_controller.hpp"
 #include "drivers/virtual_timer_controller.hpp"
@@ -25,6 +26,8 @@ etl::optional<int> handle_command(DriverCommand type, int arg1, int arg2, int ar
             return ButtonController::get().get_button_pressed(
                 static_cast<ButtonType>(arg1)
             );
+        case DriverCommand::CAPTOUCH:
+            return CapsenseController::get().get_captouch_pressed();
         case DriverCommand::TIMER_CANCEL:
             VirtualTimerController::get().virtual_timer_cancel(
                 static_cast<uint32_t>(arg1)
@@ -49,6 +52,9 @@ etl::optional<int> handle_subscribe(
             return VirtualTimerController::get().virtual_timer_start(
                 static_cast<uint32_t>(arg1), callback, 0, arg2
             );
+        case DriverSubscribe::NOTIFY_CAPTOUCH:
+            CapsenseController::get().subscribe_captouch_press(callback, process_id);
+            break;
     }
     return etl::nullopt;
 }
