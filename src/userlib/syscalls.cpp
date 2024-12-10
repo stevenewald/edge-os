@@ -85,7 +85,7 @@ bool USER_CODE get_captouch_pressed()
     RETURN_REGISTER(r0);
 }
 
-void USER_CODE subscribe_captouch_pressed(void (*callback)(int, int))
+void USER_CODE subscribe_captouch_pressed(void (*callback)(drivers::ButtonState))
 {
     SET_REGISTER(r0, (int)drivers::DriverSubscribe::NOTIFY_CAPTOUCH);
     SET_REGISTER(r1, (int)callback);

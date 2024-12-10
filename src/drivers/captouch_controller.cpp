@@ -41,27 +41,22 @@ bool CapsenseController::get_captouch_pressed()
 
 void CapsenseController::handle_gpio_interrupt(nrf_gpio_pin_sense_t sense, int pin)
 {
-    prev_touched = touched;
     if (sense == NRF_GPIO_PIN_SENSE_LOW) {
         touched = true;
     }
     else if (sense == NRF_GPIO_PIN_SENSE_HIGH) {
         touched = false;
     }
-    else {
-        printf("Unexpected cap sense pin sense\n");
-    }
-    if ((prev_touched == false) && (touched == true)) {
-        printf("Touch happened.\n");
-        for (int process_id = 0; process_id < MAX_PROCESSES; ++process_id)
-        {
-            if (subscriptions.has_callback(process_id))
-            {
-                subscriptions.call_callback(process_id, static_cast<int>(sense),
-                static_cast<int>(pin));
+    if ((prev_touched != touched)) {
+        for (int process_id = 0; process_id < MAX_PROCESSES; ++process_id) {
+            if (subscriptions.has_callback(process_id)) {
+                subscriptions.call_callback(
+                    process_id, static_cast<int>(to_cap_sense_state(sense))
+                );
             }
         }
     }
+    prev_touched = touched;
 }
 
 } // namespace edge::drivers

@@ -11,10 +11,12 @@ public:
     GPIOPinEvent(
         uint8_t pin, GPIOConfiguration resistance,
         aidan::GPIOEventController::GPIOEventCallback callback
-    ) : pin(pin)
+    ) :
+        pin(pin)
     {
         aidan::GPIOEventController::get().set_gpio_callback(
-            pin, to_pin_pull_mode(resistance), callback);
+            pin, to_pin_pull_mode(resistance), callback
+        );
     }
 
     GPIOPinEvent(const GPIOPinEvent&) = delete;

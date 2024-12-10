@@ -3,21 +3,25 @@
 #include "nrf_delay.h"
 #include "userlib/syscalls.hpp"
 
-void callback(int a, int b)
+void callback(edge::drivers::ButtonState a)
 {
-    edge::userlib::debug_print("CALLBACK: Touch detected.\n");
+    if (a == edge::drivers::ButtonState::UP) {
+        edge::userlib::debug_print("CALLBACK: Finger lifted.\n");
+    }
+    else {
+        edge::userlib::debug_print("CALLBACK: Finger pressed.\n");
+    }
 }
 
 void captouch_task(void)
 {
     edge::userlib::subscribe_captouch_pressed(callback);
     while (1) {
-        nrf_delay_ms(500);
         if (edge::userlib::get_captouch_pressed()) {
-            edge::userlib::debug_print("pressed\n");
+            // edge::userlib::debug_print("pressed\n");
         }
         else {
-            edge::userlib::debug_print("not pressed\n");
+            // edge::userlib::debug_print("not pressed\n");
         }
         edge::userlib::yield();
     }

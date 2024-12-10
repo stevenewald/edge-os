@@ -31,5 +31,6 @@ struct subscribe_callback {
 };
 
 aidan::PinPullMode to_pin_pull_mode(drivers::GPIOConfiguration config);
+drivers::ButtonState to_cap_sense_state(nrf_gpio_pin_sense_t sense);
 
 } // namespace edge::drivers
